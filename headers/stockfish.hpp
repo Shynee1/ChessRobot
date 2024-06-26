@@ -25,6 +25,9 @@ private:
 	boost::process::child stockfish;
 	StockfishSettings settings;
 	bool isGeneratingMoves = false;
+	std::string currentSearchDepth;
+	std::string currentScore;
+	std::string currentMove;
 public:
 	Stockfish(chess::Board* board, StockfishSettings settings);
 	~Stockfish();
@@ -34,4 +37,7 @@ public:
 	void generate_best_move();
 	bool is_generating_moves();
 	chess::Move get_best_move();
+	std::string get_search_depth();
+	std::string get_score();
+	std::string get_current_move();
 };

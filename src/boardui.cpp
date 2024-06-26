@@ -2,10 +2,10 @@
 
 using namespace chess;
 
-BoardUI::BoardUI(chess::Board* board, Window* window) {
+BoardUI::BoardUI(chess::Board* board) {
 	this->board = board;
-	this->window = window;
 	this->spritesheet = std::make_unique<Spritesheet>("chess_pieces.png", 2, 6);
+	this->window = Window::Instance();
 	this->assetPool = AssetPool::Instance();
 
 	SDL_Texture* boardTex = assetPool->get_texture("Board.png");
@@ -17,7 +17,7 @@ BoardUI::BoardUI(chess::Board* board, Window* window) {
 }
 
 void BoardUI::graphics() {
-	window->render(boardTexture.get());
+	window->render_object(boardTexture.get());
 
 	SDL_Rect currentSquare = { 0, 0, SQUARE_SIZE, SQUARE_SIZE };
 
@@ -28,9 +28,9 @@ void BoardUI::graphics() {
 
 		currentSquare.x = worldPosition.x;
 		currentSquare.y = worldPosition.y;
-		SDL_Rect& squareColor = coloredSquares[i];
-		if (!SDL_RectEquals(&squareColor, &EMPTY))
-			window->render(&currentSquare, coloredSquares[i]);
+		SDL_Color& squareColor = coloredSquares[i];
+		if (is_visible(squareColor))
+			window->render_color(&currentSquare, squareColor);
 		
 		if (piece == Piece::NONE) continue;
 		
@@ -38,7 +38,7 @@ void BoardUI::graphics() {
 		auto p_pieceObject = spritesheet->get_sprite(textureIndex);
 		p_pieceObject->set_pos(worldPosition);
 		p_pieceObject->set_dimensions(SQUARE_SIZE, SQUARE_SIZE);
-		window->render(p_pieceObject.get());
+		window->render_object(p_pieceObject.get());
 	}
 }
 
@@ -54,7 +54,7 @@ SDL_Point BoardUI::arrayToWorld(int arrayPos) {
 	return { x, y };
 }
 
-void BoardUI::color_square(int squarePos, SDL_Rect& color) {
+void BoardUI::color_square(int squarePos, SDL_Color& color) {
 	coloredSquares[squarePos] = color;
 }
 
@@ -62,10 +62,14 @@ void BoardUI::clear_ui() {
 	coloredSquares = {};
 }
 
-SDL_Rect& BoardUI::move_color() {
+SDL_Color& BoardUI::move_color() {
 	return MOVE_COLOR;
 }
 
-SDL_Rect& BoardUI::clicked_color() {
+SDL_Color& BoardUI::clicked_color() {
 	return CLICKED_COLOR;
+}
+
+bool BoardUI::is_visible(SDL_Color& color) {
+	return color.a != 0;
 }

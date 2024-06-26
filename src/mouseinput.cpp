@@ -2,9 +2,9 @@
 
 using namespace chess;
 
-MouseInput::MouseInput(chess::Board* board, Window* window, BoardUI* ui, OpeningBook* book) {
+MouseInput::MouseInput(chess::Board* board, BoardUI* ui, OpeningBook* book) {
 	this->board = board;
-	this->window = window;
+	this->window = Window::Instance();
 	this->ui = ui;
 	this->book = book;
 	

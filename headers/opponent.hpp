@@ -5,6 +5,11 @@
 #include "motorcontroller.hpp"
 #include "openingbook.hpp"
 
+constexpr int TEXT_PADDING_X = 10;
+constexpr SDL_Point BESTMOVE_TEXT_POS = {TEXT_PADDING_X, 10};
+constexpr SDL_Point DEPTH_TEXT_POS = {TEXT_PADDING_X, 50};
+constexpr SDL_Point SCORE_TEXT_POS = {TEXT_PADDING_X, 90};
+
 class Opponent {
 private:
 	const chess::Color color = chess::Color::BLACK;
@@ -26,9 +31,12 @@ private:
 	MotorController* motorController;
 	int level;
 	bool generatedMoves = false;
+	chess::Move lastMove = chess::Move::NO_MOVE;
 public:
 	Opponent(chess::Board* board, BoardUI* ui, OpeningBook* book, MotorController* mc, int level);
 	void update(float deltaTime);
-	void play_move(chess::Move move);
+	void graphics();
+	void play_move(chess::Move& move);
 	bool play_book_move();
+	std::string get_best_move_text();
 };

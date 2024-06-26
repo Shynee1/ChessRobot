@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS        True)
 find_package(Boost REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 find_package(glaze REQUIRED)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -38,5 +39,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     SDL2::SDL2-static
     SDL2::SDL2main
     SDL2_image::SDL2_image-static
+    SDL2_ttf::SDL2_ttf-static
     Boost::filesystem
 )

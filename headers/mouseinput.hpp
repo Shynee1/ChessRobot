@@ -8,14 +8,15 @@ private:
 	chess::Board* board;
 	chess::Movelist moves;
 
+	std::shared_ptr<Window> window;
+
 	OpeningBook* book;
 	BoardUI* ui;
-	Window* window;
 
 	int selectedPieceIdx = -1;
 	bool wasMousePressed = false;
 public:
-	MouseInput(chess::Board* board, Window* window, BoardUI* ui, OpeningBook* book);
+	MouseInput(chess::Board* board, BoardUI* ui, OpeningBook* book);
 	void update(float deltaTime);
 	void handle_first_click(int clickedSquare);
 	void handle_move_click(int clickedSquare);

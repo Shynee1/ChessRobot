@@ -28,25 +28,43 @@ SDL_Texture* AssetPool::get_texture(std::string filename) {
 	return m_textures[filename];
 }
 
-SDL_Texture* AssetPool::add_texture(Window* render_window, std::string fullPath) {
-	size_t cutoffIndex = fullPath.find_last_of("\\") + 1;
-	std::string filename = fullPath.substr(cutoffIndex, filename.size() - cutoffIndex);
+SDL_Texture* AssetPool::add_texture(std::string filepath) {
+	size_t cutoffIndex = filepath.find_last_of("\\") + 1;
+	std::string filename = filepath.substr(cutoffIndex, filename.size() - cutoffIndex);
 
 	if (m_textures[filename] == NULL)
-		m_textures[filename] = render_window->load_texture(fullPath.c_str());
+		m_textures[filename] = Window::Instance()->load_texture(filepath.c_str());
 
 	return m_textures[filename];
 }
 
-void AssetPool::load_all_textures(Window* render_window, std::string assets_path) {
-	if (!std::filesystem::exists(assets_path)){
-		std::cout << "ERROR: Cannot find path '" << assets_path << "'\n";
+void AssetPool::load_all_textures(std::string filepath) {
+	if (!std::filesystem::exists(filepath)){
+		std::cout << "ERROR: Cannot find path '" << filepath << "'\n";
 		return;
 	}
 		
-	for (auto& entry : std::filesystem::directory_iterator(assets_path)) {
+	for (auto& entry : std::filesystem::directory_iterator(filepath)) {
 		std::string extension = entry.path().extension().string();
 		if (extension == ".png" || extension == ".jpg")
-			add_texture(render_window, entry.path().string());
+			add_texture(entry.path().string());
 	}
+}
+
+TTF_Font* AssetPool::get_font(std::string filename) {
+	if (m_fonts[filename] == NULL) 
+		std::cerr << "No font with name " << filename << "\n";
+	return m_fonts[filename];
+}
+
+TTF_Font* AssetPool::add_font(std::string filepath, int size) {
+	size_t startIndex = filepath.find_last_of("\\") + 1;
+	size_t endIndex = filepath.find_last_of(".");
+	std::string sizeString = std::to_string(size);
+	std::string filename = filepath.substr(startIndex, endIndex - startIndex) + sizeString;
+
+	if (m_fonts[filename] == NULL)
+		m_fonts[filename] = TTF_OpenFont(filepath.c_str(), size);
+
+	return m_fonts[filename];
 }

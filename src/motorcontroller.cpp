@@ -108,7 +108,7 @@ void MotorController::set_electromagnet(bool on) {
 }
 
 void MotorController::pickup_piece(PieceType piece, bool fullyLiftPiece) {
-	float z = Z_MAX - fabs(PIECE_HEIGHT[piece] - PIECE_HEIGHT[0]);
+	float z = get_z_height(piece);
 	move_to(z);
 	set_electromagnet(true);
 	if (fullyLiftPiece) 
@@ -116,7 +116,7 @@ void MotorController::pickup_piece(PieceType piece, bool fullyLiftPiece) {
 }
 
 void MotorController::putdown_piece(PieceType piece) {
-	float z = Z_MAX - fabs(PIECE_HEIGHT[piece] - PIECE_HEIGHT[0]);
+	float z = get_z_height(piece);
 	move_to(z);
 	set_electromagnet(false);
 	move_to(Z_MIN);
@@ -126,7 +126,10 @@ void MotorController::move_piece(Square from, Square to, PieceType piece, bool c
 	bool fullyLiftPiece = castlingOverride || (piece == PieceType::KNIGHT);
 	move_to_square(from);
 	pickup_piece(piece, fullyLiftPiece);
-	move_to_square(to, true);
+	if (fullyLiftPiece)
+		move_to_square(to);
+	else
+		move_to_square(to, piece);
 	putdown_piece(piece);
 }
 
@@ -137,13 +140,17 @@ void MotorController::capture_piece(chess::Square from, chess::PieceType piece) 
 	putdown_piece(piece);
 }
 
-void MotorController::move_to_square(Square square, bool movingPiece) {
+void MotorController::move_to_square(Square square) {
 	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH);
 	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH);
-	if (movingPiece)
-		move_to(x, y, Z_PICKUP_OFFSET);
-	else
-		move_to(x, y);
+	move_to(x, y);
+}
+
+void MotorController::move_to_square(chess::Square square, chess::PieceType piece) {
+	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH);
+	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH);
+	float z = get_z_height(piece) - Z_PICKUP_OFFSET;
+	move_to(x, y, z);
 }
 
 void MotorController::move_to(float x, float y, float z) {
@@ -171,4 +178,8 @@ void MotorController::go_home() {
 void MotorController::wait_for_response(int postResponseDelay) {
 	isWaiting = true;
 	delayTimer = postResponseDelay;
+}
+
+float MotorController::get_z_height(PieceType piece) {
+	return Z_MAX - fabs(PIECE_HEIGHT[piece] - PIECE_HEIGHT[0]);
 }
