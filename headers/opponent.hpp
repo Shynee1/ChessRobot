@@ -1,42 +1,37 @@
 #pragma once
 #include "utility.hpp"
+#include "openingbook.hpp"
 #include "stockfish.hpp"
 #include "boardui.hpp"
+#include "gamemanager.hpp"
 #include "motorcontroller.hpp"
-#include "openingbook.hpp"
 
-constexpr int TEXT_PADDING_X = 10;
-constexpr SDL_Point BESTMOVE_TEXT_POS = {TEXT_PADDING_X, 10};
-constexpr SDL_Point DEPTH_TEXT_POS = {TEXT_PADDING_X, 50};
-constexpr SDL_Point SCORE_TEXT_POS = {TEXT_PADDING_X, 90};
-
-class Opponent {
+class Opponent : public Component {
 private:
 	const chess::Color color = chess::Color::BLACK;
 	const std::array<StockfishSettings, 9> levelMap = { 
 		StockfishSettings(-20, 1, 10, 2),
-		StockfishSettings(-9, 5, 50, 2),
-		StockfishSettings(-5, 5, 100, 2),
-		StockfishSettings(-1, 5, 150, 2),
 		StockfishSettings(3, 5, 200, 2),
-		StockfishSettings(7, 5, 300, 2),
-		StockfishSettings(11, 8, 400, 2),
-		StockfishSettings(7, 16, 500, 2),
 		StockfishSettings(20, 22, 1500, 2)
 	};
 	std::unique_ptr<Stockfish> stockfish;
-	chess::Board* board;
-	BoardUI* ui;
-	OpeningBook* book;
-	MotorController* motorController;
-	int level;
+	std::shared_ptr<GUI> gui;
+	std::shared_ptr<chess::Board> board;
+	std::shared_ptr<OpeningBook> book;
+	std::shared_ptr<MotorController> motorController;
+	std::shared_ptr<BoardUI> boardUI;
+	int level = 0;
 	bool generatedMoves = false;
 	chess::Move lastMove = chess::Move::NO_MOVE;
 public:
-	Opponent(chess::Board* board, BoardUI* ui, OpeningBook* book, MotorController* mc, int level);
-	void update(float deltaTime);
+	Opponent() = default;
+	void start();
+	void update();
 	void graphics();
+private:
 	void play_move(chess::Move& move);
 	bool play_book_move();
+public:
 	std::string get_best_move_text();
+	void set_stockfish_level(int level);
 };

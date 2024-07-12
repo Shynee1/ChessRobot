@@ -90,8 +90,8 @@ void Window::render_texture(SDL_Texture *p_texture, int x, int y) {
 	SDL_RenderCopy(renderer, p_texture, NULL, &resized);
 }
 
-void Window::render_color(SDL_Rect *p_rect, SDL_Color &color) {
-	SDL_Rect resized = world_to_screen(*p_rect);
+void Window::render_color(SDL_Rect rect, SDL_Color color) {
+	SDL_Rect resized = world_to_screen(rect);
 	SDL_SetRenderDrawColor(
 		renderer, 
 		color.r, 
@@ -100,16 +100,19 @@ void Window::render_color(SDL_Rect *p_rect, SDL_Color &color) {
 		color.a
 	);
 	SDL_RenderFillRect(renderer, &resized);
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 }
 
-void Window::render_text(SDL_Point pos, std::string text, TTF_Font* font, SDL_Color color) {
-	SDL_Surface* textSurface = TTF_RenderText_Blended(font, text.c_str(), color);
+void Window::render_label(Label label) {
+	SDL_Surface* textSurface = TTF_RenderText_Blended(
+		label.get_font(), 
+		label.get_text().c_str(), 
+		label.get_color()
+	);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
 
 	SDL_Rect dst;
-	dst.x = pos.x;
-	dst.y = pos.y;
+	dst.x = label.get_dimensions().x;
+	dst.y = label.get_dimensions().y;
 	dst.w = textSurface->w;
 	dst.h = textSurface->h;
 
@@ -118,6 +121,17 @@ void Window::render_text(SDL_Point pos, std::string text, TTF_Font* font, SDL_Co
 	SDL_RenderCopy(renderer, texture, NULL, &resized);
 	SDL_FreeSurface(textSurface);
 	SDL_DestroyTexture(texture);
+}
+
+void Window::render_button(Button& button) {
+	if (!button.is_visible()) return;
+
+	if (button.is_pressed())
+		render_color(button.get_dimensions(), button.get_pressed_color());
+	else 
+		render_color(button.get_dimensions(), button.get_released_color());
+	
+	render_label(button.get_label());
 }
 
 SDL_Rect Window::world_to_screen(SDL_Rect& rect) {
@@ -129,7 +143,7 @@ SDL_Rect Window::world_to_screen(SDL_Rect& rect) {
 	return converted;
 }
 
-void Window::update(float dt) {
+void Window::update() {
 	int mouseX = 0;
 	int mouseY = 0;
 	SDL_GetMouseState(&mouseX, &mouseY);
@@ -141,6 +155,7 @@ void Window::update(float dt) {
 void Window::mouse_press_callback(SDL_MouseButtonEvent &e) {
 	if (e.button != SDL_BUTTON_LEFT) return;
 	isMousePressed = true;
+
 }
 
 
@@ -148,7 +163,6 @@ void Window::mouse_unpress_callback(SDL_MouseButtonEvent &e) {
 	if (e.button != SDL_BUTTON_LEFT) return;
 	isMousePressed = false;
 }
-
 
 void Window::close() {
 	isRunning = false;
@@ -165,6 +179,7 @@ void Window::display() {
 }
 
 void Window::clear() {
+	SDL_SetRenderDrawColor(renderer, DARK_GREY.r, DARK_GREY.b, DARK_GREY.g, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
 }
 

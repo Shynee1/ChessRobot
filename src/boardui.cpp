@@ -2,23 +2,22 @@
 
 using namespace chess;
 
-BoardUI::BoardUI(chess::Board* board) {
-	this->board = board;
-	this->spritesheet = std::make_unique<Spritesheet>("chess_pieces.png", 2, 6);
+void BoardUI::start(){
 	this->window = Window::Instance();
 	this->assetPool = AssetPool::Instance();
+	this->gui = GUI::Instance();
+	this->board = GameManager::Instance()->get_board();
 
-	SDL_Texture* boardTex = assetPool->get_texture("Board.png");
-	this->boardTexture = std::make_unique<RenderObject>(boardTex);
-	this->boardTexture->set_dimensions(WORLD_HEIGHT, WORLD_HEIGHT);
-	this->boardTexture->align_center();
+	this->spritesheet = std::make_unique<Spritesheet>("chess_pieces.png", 2, 6);
 
 	movegen::legalmoves(moves, *board);
 }
 
-void BoardUI::graphics() {
-	window->render_object(boardTexture.get());
+void BoardUI::update() {
 
+}
+
+void BoardUI::graphics() {
 	SDL_Rect currentSquare = { 0, 0, SQUARE_SIZE, SQUARE_SIZE };
 
 	for (int i = 0; i < 64; i++) {
@@ -28,9 +27,10 @@ void BoardUI::graphics() {
 
 		currentSquare.x = worldPosition.x;
 		currentSquare.y = worldPosition.y;
+		
 		SDL_Color& squareColor = coloredSquares[i];
 		if (is_visible(squareColor))
-			window->render_color(&currentSquare, squareColor);
+			window->render_color(currentSquare, squareColor);
 		
 		if (piece == Piece::NONE) continue;
 		
@@ -42,19 +42,7 @@ void BoardUI::graphics() {
 	}
 }
 
-int BoardUI::worldToArray(SDL_Point& worldPos) {
-	int rank = (WORLD_HEIGHT - worldPos.y) / SQUARE_SIZE;
-	int file = (worldPos.x - BOARD_SHIFT) / SQUARE_SIZE;
-	return get_array_index(rank, file);
-}
-
-SDL_Point BoardUI::arrayToWorld(int arrayPos) {
-	int x = get_file(arrayPos) * SQUARE_SIZE + BOARD_SHIFT;
-	int y = (WORLD_HEIGHT - SQUARE_SIZE) - (get_rank(arrayPos) * SQUARE_SIZE);
-	return { x, y };
-}
-
-void BoardUI::color_square(int squarePos, SDL_Color& color) {
+void BoardUI::color_square(int squarePos, const SDL_Color& color) {
 	coloredSquares[squarePos] = color;
 }
 
@@ -62,11 +50,11 @@ void BoardUI::clear_ui() {
 	coloredSquares = {};
 }
 
-SDL_Color& BoardUI::move_color() {
+const SDL_Color& BoardUI::move_color() {
 	return MOVE_COLOR;
 }
 
-SDL_Color& BoardUI::clicked_color() {
+const SDL_Color& BoardUI::clicked_color() {
 	return CLICKED_COLOR;
 }
 

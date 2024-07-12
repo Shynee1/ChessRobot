@@ -1,4 +1,5 @@
 #pragma once
+#define WIN32_LEAN_AND_MEAN
 #include <array>
 #include <vector>
 #include <iostream>
@@ -13,12 +14,28 @@
 #include <queue>
 #include <stack>
 #include <fstream>
+#include <time.h> 
+#include <functional>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <chess.hpp>
+#include <serialib.hpp>
 
 typedef std::uint64_t U64;
 
 constexpr int WORLD_WIDTH = 1280;
 constexpr int WORLD_HEIGHT = 720;
+constexpr int SQUARE_SIZE = WORLD_HEIGHT / 8;
+constexpr int BOARD_SHIFT = (WORLD_WIDTH / 2.0) - (WORLD_HEIGHT / 2.0);
+
+constexpr SDL_Color BLACK = {0, 0, 0, 255};
+constexpr SDL_Color WHITE = {255, 255, 255, 255};
+constexpr SDL_Color RED = {255, 0, 0, 255};
+constexpr SDL_Color LIGHT_BLUE = { 66, 135, 245, 255};
+constexpr SDL_Color LIGHT_GREY = {236, 236, 236, 255};
+constexpr SDL_Color DARK_GREY = {56, 56, 56, 255};
+constexpr SDL_Color DARK_RED = {185, 0, 0, 255};
 
 constexpr char STARTING_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -35,6 +52,10 @@ void print_bitboard(U64 bitboard);
 U64 fen_to_bitboard(std::string fen);
 
 int get_texture_index(chess::Piece& piece);
+int worldToArray(SDL_Point& worldPos);
+SDL_Point arrayToWorld(int arrayPos);
 
 std::vector<std::string> split_string(std::string str, char delimiter);
 int signum(int x);
+
+void fatal_log(std::string log);

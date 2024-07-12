@@ -2,37 +2,28 @@
 
 using namespace chess;
 
-MotorController::MotorController(Board* board) {
-	this->board = board;
-
-	char isOpen = arduino.openDevice(ARDUINO_PORT, BAUD_RATE);
-	if (isOpen == 1)
-		std::cout << "Connection successfully opened to " << ARDUINO_PORT << "\n";
-	else
-		std::cerr << "ERROR: Could not connect to " << ARDUINO_PORT << "\n";
-
-	arduino.writeString("\r\n\r\n");
-	arduino.flushReceiver();
-	wait_for_response(500);
-
-	reset();
-}
-
 MotorController::~MotorController() {
 	arduino.closeDevice();
 }
 
-void MotorController::update(float dt) {
+void MotorController::start() {
+	if (!hasBeenHomed)
+		home_machine();
+
+	this->gui = GUI::Instance();
+	this->board = GameManager::Instance()->get_board();
+}
+
+void MotorController::update() {
 	isWaiting = should_wait();
 
-	if (isWaiting || gcodeBuffer.empty())
+	if (isWaiting || gcodeBuffer.empty() || !arduino.isDeviceOpen())
 		return;
 
 	std::string gcodeCommand = gcodeBuffer.front() + "\n";
 	bool isDelay = toupper(gcodeCommand[0]) == 'D';
 	if (isDelay) {
 		int delayAmount = stoi(gcodeCommand.substr(2));
-		std::cout << delayAmount << "\n";
 		wait_for_response(delayAmount);
 	}
 	else {
@@ -43,11 +34,25 @@ void MotorController::update(float dt) {
 	gcodeBuffer.pop();
 }
 
+void MotorController::graphics() {
+	
+}
+
+void MotorController::connect() {
+	char isOpen = arduino.openDevice(ARDUINO_PORT, BAUD_RATE);
+	if (isOpen != 1) return;
+	
+	GUI::Instance()->get_label("machineConnected").set_text("Connected");
+
+	arduino.writeString("\r\n\r\n");
+	arduino.flushReceiver();
+	wait_for_response(0);
+}
+
 bool MotorController::should_wait() {
 	if (!isWaiting) return false;
 
 	if (delayTimer > 0) {
-		std::cout << delayTimer << "\n";
 		delayTimer -= 1;
 		return true;
 	}
@@ -169,6 +174,15 @@ void MotorController::home_machine() {
 	gcodeBuffer.push("$H");
 	gcodeBuffer.push("G10 P0 L20 X0 Y0 Z0");
 	gcodeBuffer.push("G28.1");
+	hasBeenHomed = true;
+}
+
+void MotorController::unlock() {
+	gcodeBuffer.push("$X");
+}
+
+void MotorController::soft_reset() {
+	gcodeBuffer.push("^X");
 }
 
 void MotorController::go_home() {

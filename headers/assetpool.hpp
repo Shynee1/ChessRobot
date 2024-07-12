@@ -21,4 +21,5 @@ public:
 	void load_all_textures(std::string filepath);
 	TTF_Font* get_font(std::string filename);
 	TTF_Font* add_font(std::string filepath, int size);
+	void load_font_sizes(std::string filepath, std::vector<int> sizes);
 };

@@ -2,17 +2,13 @@
 
 using namespace chess;
 
-MouseInput::MouseInput(chess::Board* board, BoardUI* ui, OpeningBook* book) {
-	this->board = board;
-	this->window = Window::Instance();
-	this->ui = ui;
-	this->book = book;
-	
+void MouseInput::start() {
+	this->board = GameManager::Instance()->get_board();
 	movegen::legalmoves(moves, *board);
 }
 
-void MouseInput::update(float dt) {
-	if (!window->is_mouse_pressed()) {
+void MouseInput::update() {
+	if (!Window::Instance()->is_mouse_pressed()) {
 		wasMousePressed = false;
 		return;
 	}
@@ -20,10 +16,10 @@ void MouseInput::update(float dt) {
 	if (wasMousePressed || board->sideToMove() != Color::WHITE)
 		return;
 
-	SDL_Point mousePos = window->get_mouse_pos();
-	int arrayIdx = ui->worldToArray(mousePos);
+	SDL_Point mousePos = Window::Instance()->get_mouse_pos();
+	int arrayIdx = worldToArray(mousePos);
 
-	if (!(arrayIdx >= 0 && arrayIdx < 64)) {
+	if (arrayIdx <= 0 || arrayIdx > 64) {
 		wasMousePressed = true;
 		return;
 	}
@@ -36,7 +32,12 @@ void MouseInput::update(float dt) {
 	this->wasMousePressed = true;
 }
 
+void MouseInput::graphics() {
+	
+}
+
 void MouseInput::handle_first_click(int clickedSquare) {
+	auto ui = GameManager::Instance()->get_component<BoardUI>();
 	Piece selectedPiece = board->at(clickedSquare);
 	if (selectedPiece.type() == PieceType::NONE || selectedPiece.color() != board->sideToMove())
 		return;
@@ -48,6 +49,7 @@ void MouseInput::handle_first_click(int clickedSquare) {
 }
 
 void MouseInput::handle_move_click(int clickedSquare) {
+	auto ui = GameManager::Instance()->get_component<BoardUI>();
 	Move move = get_legal_move(moves, selectedPieceIdx, clickedSquare);
 
 	ui->clear_ui();
@@ -59,8 +61,8 @@ void MouseInput::handle_move_click(int clickedSquare) {
 	}
 
 	board->makeMove(move);
-	book->updateMoves(board->hash());
 	movegen::legalmoves(moves, *board);
+	GameManager::Instance()->get_opening_book()->updateMoves(board->hash());
 }
 
 Move MouseInput::get_legal_move(Movelist& moves, int from, int to) {
@@ -74,6 +76,7 @@ Move MouseInput::get_legal_move(Movelist& moves, int from, int to) {
 
 
 void MouseInput::color_legal_moves(Movelist& moves, int squareIdx) {
+	auto ui = GameManager::Instance()->get_component<BoardUI>();
 	movegen::legalmoves(moves, *board);
 	for (Move& move : moves) {
 		if (move.from().index() == squareIdx) {

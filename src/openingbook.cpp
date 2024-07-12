@@ -2,7 +2,7 @@
 
 using namespace chess;
 
-OpeningBook::OpeningBook(Board* board) {
+OpeningBook::OpeningBook(std::shared_ptr<chess::Board> board) {
 	this->board = board;
 	if (std::filesystem::exists(BOOK_FP))
 		loadBook(BOOK_FP);
@@ -19,13 +19,13 @@ void OpeningBook::createBook(std::string filepath) {
 		book.push_back(moveQueue);
 	}
 
-	glz::write_file_binary(book, BOOK_FP, std::string{});
+	auto error = glz::write_file_binary(book, BOOK_FP, std::string{});
 
 	gamesFile.close();
 }
 
 void OpeningBook::loadBook(std::string filepath) {
-	glz::read_file_binary(book, BOOK_FP, std::string{});
+	auto error = glz::read_file_binary(book, BOOK_FP, std::string{});
 }
 
 void OpeningBook::updateMoves(U64 newZobrist) {

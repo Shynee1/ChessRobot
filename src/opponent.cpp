@@ -1,15 +1,17 @@
 #include "opponent.hpp"
 
-Opponent::Opponent(chess::Board* board, BoardUI* ui, OpeningBook* book, MotorController* mc, int level) {
-	this->board = board;
-	this->level = level;
-	this->ui = ui;
-	this->book = book;
-	this->motorController = mc;
-	this->stockfish = std::make_unique<Stockfish>(board, levelMap[level]);
+void Opponent::start() {
+	this->gui = GUI::Instance();
+	this->board = GameManager::Instance()->get_board();
+	this->book = GameManager::Instance()->get_opening_book();
+	this->motorController = GameManager::Instance()->get_component<MotorController>();
+	this->boardUI = GameManager::Instance()->get_component<BoardUI>();
+	this->stockfish = std::make_unique<Stockfish>(board);
+	set_stockfish_level(level);
+	this->stockfish->new_game();
 }
 
-void Opponent::update(float deltaTime) {
+void Opponent::update() {
 	if (board->sideToMove() != color) return;
 
 	if (play_book_move()) return;
@@ -28,23 +30,18 @@ void Opponent::update(float deltaTime) {
 	}
 }
 
-void Opponent::graphics() {
-	TTF_Font* arial = AssetPool::Instance()->get_font("arial24");
-	std::string bestMoveText = "Best Move: " + get_best_move_text();
-	std::string depthText = "Depth: " + stockfish->get_search_depth();
-	std::string scoreText = "Score: " + stockfish->get_score();
-
-	Window::Instance()->render_text(BESTMOVE_TEXT_POS, bestMoveText, arial, BLACK);
-	Window::Instance()->render_text(DEPTH_TEXT_POS, depthText, arial, BLACK);
-	Window::Instance()->render_text(SCORE_TEXT_POS, scoreText, arial, BLACK);
+void Opponent::graphics(){
+	gui->get_label("bestMove").set_text("Best Move: " + get_best_move_text());
+	gui->get_label("depth").set_text("Depth: " + stockfish->get_search_depth());
+	gui->get_label("score").set_text("Evaluation: " + stockfish->get_score());
 }
 
 void Opponent::play_move(chess::Move& move) {
 	motorController->send_move(move);
-	ui->clear_ui();
+	boardUI->clear_ui();
 	board->makeMove(move);
-	ui->color_square(move.from().index(), ui->clicked_color());
-	ui->color_square(move.to().index(), ui->clicked_color());
+	boardUI->color_square(move.from().index(), boardUI->clicked_color());
+	boardUI->color_square(move.to().index(), boardUI->clicked_color());
 	book->updateMoves(board->hash());
 	lastMove = move;
 }
@@ -65,4 +62,17 @@ std::string Opponent::get_best_move_text() {
 		return chess::uci::moveToUci(lastMove);
 	else
 		return std::string("N/A");
+}
+
+void Opponent::set_stockfish_level(int level) {
+	this->level = level;
+	
+	StockfishSettings setting = levelMap[level];
+	if (GameManager::Instance()->is_game_running())
+		stockfish->set_settings(setting);
+
+	auto gui = GUI::Instance();
+	gui->get_label("skillLevel").set_text("Skill Level: " + std::to_string(setting.skillLevel));
+	gui->get_label("targetDepth").set_text("Target Depth: " + std::to_string(setting.depth));
+	gui->get_label("thinkTime").set_text("Think Time: " + std::to_string(setting.movetime));
 }

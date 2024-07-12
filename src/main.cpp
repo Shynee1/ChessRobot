@@ -1,43 +1,79 @@
-#include <time.h> 
-#include "window.hpp"
-#include "AssetPool.hpp"
 #include "utility.hpp"
-#include "spritesheet.hpp"
+#include "window.hpp"
+#include "assetpool.hpp"
+#include "gui.hpp"
+#include "gamemanager.hpp"
 #include "BoardUI.hpp"
-#include "opponent.hpp"
+#include "button.hpp"
 #include "mouseinput.hpp"
-#include "boardinput.hpp"
-#include "openingbook.hpp"
+#include "motorcontroller.hpp"
+#include "opponent.hpp"
 
 int main(int argc, char* args[]){
 	srand(time(0));
 
-	Window::Instance()->create_window("Chess", 1280, 720);
-	AssetPool::Instance()->load_all_textures("assets\\textures"); 
-	AssetPool::Instance()->add_font("assets\\fonts\\arial.ttf", 24);
+	auto window = Window::Instance();
+	window->create_window("Chess", 1280, 720);
 
-	chess::Board board(STARTING_FEN);
-	OpeningBook book(&board);
-	MotorController motorController(&board);
-	BoardUI boardUI(&board);
-	MouseInput input(&board, &boardUI, &book);
-	Opponent opponent(&board, &boardUI, &book, &motorController, 8);
-	//BoardInput input(&board, &boardUI);
+	auto assetPool = AssetPool::Instance();
+	assetPool->load_all_textures("assets\\textures"); 
 
-	motorController.home_machine();
+	std::vector<int> fontSizes = {38, 21, 24, 15, 31, 9};
+	assetPool->add_font("assets\\fonts\\arial.ttf", 22);
+	assetPool->load_font_sizes("assets\\fonts\\panton.ttf", fontSizes);
 
-	Uint64 currentTick = SDL_GetPerformanceCounter();
-	Uint64 lastTick = 0;
-	double deltaTime = 0;
+	auto gui = GUI::Instance();
+	gui->create_ui();
 
-	std::shared_ptr<Window> window = Window::Instance();
+	auto gameManager = GameManager::Instance();
+	gameManager->add_component<BoardUI>();
+	gameManager->add_component<MouseInput>();
+	gameManager->add_component<MotorController>();
+	gameManager->add_component<Opponent>();
+
+	gui->assign_button_callback("machine", [](){
+		GameManager::Instance()->get_component<MotorController>()->connect();
+	});
+
+	gui->assign_button_callback("home", [](){
+		GameManager::Instance()->get_component<MotorController>()->home_machine();
+	});
+
+	gui->assign_button_callback("unlock", [](){
+		GameManager::Instance()->get_component<MotorController>()->unlock();
+	});
+
+	gui->assign_button_callback("softReset", [](){
+		GameManager::Instance()->get_component<MotorController>()->soft_reset();
+	});
+
+	gui->assign_button_callback("easy", [](){
+		GameManager::Instance()->get_component<Opponent>()->set_stockfish_level(0);
+	});
+
+	gui->assign_button_callback("medium", [](){
+		GameManager::Instance()->get_component<Opponent>()->set_stockfish_level(1);
+	});
+
+	gui->assign_button_callback("hard", [](){
+		GameManager::Instance()->get_component<Opponent>()->set_stockfish_level(2);
+	});
+
+	gui->assign_button_callback("start", [](){
+		GameManager::Instance()->start_game(STARTING_FEN);
+		GUI::Instance()->get_button("start").set_visible(false);
+		GUI::Instance()->get_button("reset").set_visible(true);
+	});
+
+	gui->assign_button_callback("reset", [](){
+		GameManager::Instance()->end_game();
+		GUI::Instance()->get_button("start").set_visible(true);
+		GUI::Instance()->get_button("reset").set_visible(false);
+	});
+
 	SDL_Event event;
 	while (window->is_running()){
 		window->clear();
-
-		lastTick = currentTick;
-		currentTick = SDL_GetPerformanceCounter();
-		deltaTime = (double)((currentTick - lastTick)*1000 / (double)SDL_GetPerformanceFrequency() );
 
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
@@ -53,18 +89,14 @@ int main(int argc, char* args[]){
 			}
 		}
 
-		window->update(deltaTime);
-		motorController.update(deltaTime);
-		input.update(deltaTime);
-		opponent.update(deltaTime);
+		window->update();
+		gui->update();
+		gameManager->update_components();
 
-		//motorController.graphics();
-		opponent.graphics();
-		boardUI.graphics();
-		
+		gui->graphics();
+		gameManager->draw_components();
 		window->display();
 	}
 	
 	return 0;
 }
-

@@ -24,7 +24,7 @@ BoardInput::~BoardInput() {
 	serial.closeDevice();
 }
 
-void BoardInput::update(float deltaTime) {
+void BoardInput::update() {
 	if (board->sideToMove() != Color::WHITE) return;
 
 	U64 currentBoard = read_latest_bitboard();

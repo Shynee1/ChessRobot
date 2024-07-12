@@ -34,6 +34,7 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 #define NO_POSIX_TIME
 #endif
     // Accessing to the serial port under Windows
+#define NOMINMAX
 #include <windows.h>
 #endif
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "utility.hpp"
-#include "serialib.hpp"
-#include "chess.hpp"
+#include "boardui.hpp"
+#include "component.hpp"
 
 constexpr char ARDUINO_PORT[] = "COM4";
 constexpr int BAUD_RATE = 115200;
@@ -16,18 +16,23 @@ constexpr float Z_MAX = 103;
 constexpr float Z_MIN = 10;
 constexpr float Z_PICKUP_OFFSET = 10;
 
-class MotorController {
+class MotorController : public Component {
 private:
-	chess::Board* board;
+	std::shared_ptr<chess::Board> board;
+	std::shared_ptr<GUI> gui;
+	
 	serialib arduino;
 	std::queue<std::string> gcodeBuffer;
 	bool electroMagnetOn = false;
 	bool isWaiting = false;
+	bool hasBeenHomed = false;
 	int delayTimer = 0;
 public:
-	MotorController(chess::Board* board);
 	~MotorController();
-	void update(float dt);
+	void start();
+	void update();
+	void graphics();
+	void connect();
 	bool should_wait();
 	void send_move(chess::Move move);
 	void reset();
@@ -42,6 +47,8 @@ public:
 	void move_to(float x, float y);
 	void move_to(float z);
 	void home_machine();
+	void unlock();
+	void soft_reset();
 	void go_home();
 	void wait_for_response(int postResponseDelay);
 	float get_z_height(chess::PieceType piece);

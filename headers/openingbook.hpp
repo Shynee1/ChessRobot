@@ -1,8 +1,8 @@
 #pragma once
 #include "utility.hpp"
-#include "chess.hpp"
 #include "glaze/glaze.hpp"
 #include <algorithm>
+#include <filesystem>
 
 struct BookElement {
 	U64 zobristKey;
@@ -21,9 +21,9 @@ class OpeningBook {
 private:
 	Book book;
 	std::stack<chess::Move> lastMoves;
-	chess::Board* board;
+	std::shared_ptr<chess::Board> board;
 public:
-	OpeningBook(chess::Board* board);
+	OpeningBook(std::shared_ptr<chess::Board> board);
 	void createBook(std::string filepath);
 	void loadBook(std::string filepath);
 	void updateMoves(U64 newZobrist);

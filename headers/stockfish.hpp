@@ -18,23 +18,26 @@ struct StockfishSettings {
 
 class Stockfish {
 private:
-	chess::Board* board;
-	chess::Move bestMove;
+	boost::process::child stockfish;
 	boost::process::ipstream readStream;
 	boost::process::opstream writeStream;
-	boost::process::child stockfish;
+	
+	std::shared_ptr<chess::Board> board;
+	chess::Move bestMove;
 	StockfishSettings settings;
 	bool isGeneratingMoves = false;
 	std::string currentSearchDepth;
 	std::string currentScore;
 	std::string currentMove;
 public:
-	Stockfish(chess::Board* board, StockfishSettings settings);
+	Stockfish(std::shared_ptr<chess::Board> board);
 	~Stockfish();
 	void update();
 	void wait_for_ready();
 	void new_game();
 	void generate_best_move();
+	void set_settings(StockfishSettings settings);
+	std::string generate_score_string(std::string scoreType, std::string scoreValue);
 	bool is_generating_moves();
 	chess::Move get_best_move();
 	std::string get_search_depth();

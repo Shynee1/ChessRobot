@@ -85,6 +85,18 @@ int get_texture_index(chess::Piece& piece) {
 	return colorIndex;
 }
 
+int worldToArray(SDL_Point& worldPos) {
+	int rank = (WORLD_HEIGHT - worldPos.y) / SQUARE_SIZE;
+	int file = (worldPos.x - BOARD_SHIFT) / SQUARE_SIZE;
+	return get_array_index(rank, file);
+}
+
+SDL_Point arrayToWorld(int arrayPos) {
+	int x = get_file(arrayPos) * SQUARE_SIZE + BOARD_SHIFT;
+	int y = (WORLD_HEIGHT - SQUARE_SIZE) - (get_rank(arrayPos) * SQUARE_SIZE);
+	return { x, y };
+}
+
 std::vector<std::string> split_string(std::string str, char delimiter) {
 	std::vector<std::string> res;
 
@@ -108,3 +120,7 @@ int signum(int x) {
 		return 0;
 }
 
+void fatal_log(std::string log) {
+	std::cerr << log << std::endl;
+	exit(EXIT_FAILURE);
+}

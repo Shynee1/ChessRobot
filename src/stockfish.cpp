@@ -2,20 +2,16 @@
 
 namespace bp = boost::process;
 
-Stockfish::Stockfish(chess::Board* board, StockfishSettings settings) {
-	this->settings = settings;
+Stockfish::Stockfish(std::shared_ptr<chess::Board> board) {
+	stockfish = bp::child(EXEC_PATH, bp::std_in < writeStream, bp::std_out > readStream);
+	writeStream << "uci" << std::endl;
+	
 	this->board = board;
+
+	set_settings({-20, 1, 10, 2});
 
 	this->currentSearchDepth = "Book";
 	this->currentScore = "Book";
-
-	stockfish = bp::child(EXEC_PATH, bp::std_in < writeStream, bp::std_out > readStream);
-	writeStream << "uci" << std::endl;
-	writeStream << "setoption name Skill Level value " << settings.skillLevel << std::endl;
-	writeStream << "setoption name Threads value " << settings.threads << std::endl;
-
-	new_game();
-	wait_for_ready();
 }
 
 Stockfish::~Stockfish() {
@@ -32,21 +28,16 @@ void Stockfish::update() {
 
 	if (line.find("depth") != -1){
 		this->currentSearchDepth = split[2];
-		if (split[8] == "mate")
-			this->currentScore = "Mate in " + std::to_string(stoi(split[9]) - 1);
-		else
-			this->currentScore = split[9];
+		this->currentScore = generate_score_string(split[8], split[9]);
 		this->currentMove = split[21];
 	}
 	
 	if (line.find("bestmove") != -1) {
 		std::string uciMove = split[1];
 	
-		// Fix checkmate issue
-		if (uciMove.length() > 4 && uciMove[4] == '\r'){
+		// Fix formatting issue
+		if (uciMove.length() > 4 && uciMove[4] == '\r')
 			uciMove = uciMove.substr(0, 4);
-			this->currentScore = std::string("Checkmate");
-		}
 
 		bestMove = chess::uci::uciToMove(*board, uciMove);
 		isGeneratingMoves = false;
@@ -73,6 +64,22 @@ void Stockfish::generate_best_move() {
 	writeStream << "go depth " << settings.depth << " movetime " << settings.movetime << std::endl;
 
 	isGeneratingMoves = true;
+}
+
+void Stockfish::set_settings(StockfishSettings settings) {
+	this->settings = settings;
+	writeStream << "setoption name Skill Level value " << settings.skillLevel << std::endl;
+	writeStream << "setoption name Threads value " << settings.threads << std::endl;
+}
+
+std::string Stockfish::generate_score_string(std::string scoreType, std::string scoreValue) {
+	if (scoreType != "mate") return scoreValue;
+
+	int moveCount = stoi(scoreValue) - 1;
+	if (moveCount == 0)
+		return "Checkmate";
+		
+	return "Mate in " + std::to_string(moveCount);
 }
 
 bool Stockfish::is_generating_moves() {
