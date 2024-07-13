@@ -9,13 +9,12 @@ std::shared_ptr<GameManager> GameManager::Instance() {
 }
     
 void GameManager::start_game(std::string fen){
+    this->isGameRunning = true;
     this->board = std::make_shared<chess::Board>(fen);
     this->openingBook = std::make_shared<OpeningBook>(board);
 
     for (const auto& component : components)
         component->start();
-
-    this->isGameRunning = true;
 }
 
 void GameManager::end_game(){

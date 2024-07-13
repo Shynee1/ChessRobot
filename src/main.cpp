@@ -9,7 +9,9 @@
 #include "motorcontroller.hpp"
 #include "opponent.hpp"
 
-int main(int argc, char* args[]){
+void register_button_callbacks();
+
+int main (int argc, char* args[]){
 	srand(time(0));
 
 	auto window = Window::Instance();
@@ -31,6 +33,40 @@ int main(int argc, char* args[]){
 	gameManager->add_component<MotorController>();
 	gameManager->add_component<Opponent>();
 
+	register_button_callbacks();
+
+	SDL_Event event;
+	while (window->is_running()){
+		window->clear();
+
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+			case SDL_QUIT: 
+				window->close(); 
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				window->mouse_press_callback(event.button);
+				break;
+			case SDL_MOUSEBUTTONUP:
+				window->mouse_unpress_callback(event.button);
+				break;
+			}
+		}
+
+		window->update();
+		gui->update();
+		gameManager->update_components();
+
+		gui->graphics();
+		gameManager->draw_components();
+		window->display();
+	}
+	
+	return 0;
+}
+
+void register_button_callbacks() {
+	auto gui = GUI::Instance();
 	gui->assign_button_callback("machine", [](){
 		GameManager::Instance()->get_component<MotorController>()->connect();
 	});
@@ -70,33 +106,4 @@ int main(int argc, char* args[]){
 		GUI::Instance()->get_button("start").set_visible(true);
 		GUI::Instance()->get_button("reset").set_visible(false);
 	});
-
-	SDL_Event event;
-	while (window->is_running()){
-		window->clear();
-
-		while (SDL_PollEvent(&event)) {
-			switch (event.type) {
-			case SDL_QUIT: 
-				window->close(); 
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				window->mouse_press_callback(event.button);
-				break;
-			case SDL_MOUSEBUTTONUP:
-				window->mouse_unpress_callback(event.button);
-				break;
-			}
-		}
-
-		window->update();
-		gui->update();
-		gameManager->update_components();
-
-		gui->graphics();
-		gameManager->draw_components();
-		window->display();
-	}
-	
-	return 0;
 }

@@ -15,6 +15,7 @@ constexpr float PIECE_HEIGHT[7] = { 39.8, 51.8, 61.7, 42.7, 76.1, 83.5, 0 };
 constexpr float Z_MAX = 103;
 constexpr float Z_MIN = 10;
 constexpr float Z_PICKUP_OFFSET = 10;
+constexpr int 	DELAY_THRESHOLD = 100;
 
 class MotorController : public Component {
 private:
@@ -26,7 +27,7 @@ private:
 	bool electroMagnetOn = false;
 	bool isWaiting = false;
 	bool hasBeenHomed = false;
-	int delayTimer = 0;
+	int delayTimer = 500;
 public:
 	~MotorController();
 	void start();

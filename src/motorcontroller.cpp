@@ -7,11 +7,10 @@ MotorController::~MotorController() {
 }
 
 void MotorController::start() {
-	if (!hasBeenHomed)
-		home_machine();
-
+	if (!hasBeenHomed) home_machine();
 	this->gui = GUI::Instance();
 	this->board = GameManager::Instance()->get_board();
+	this->delayTimer = DELAY_THRESHOLD;
 }
 
 void MotorController::update() {
@@ -35,7 +34,32 @@ void MotorController::update() {
 }
 
 void MotorController::graphics() {
+	if (!arduino.isDeviceOpen())
+		return;
 	
+	if (delayTimer > 0){
+		delayTimer--;
+		return;
+	}
+
+	arduino.writeString("?");
+
+	char buffer[100];
+	arduino.readString(buffer, '>', 100);
+
+	std::string machineData = std::string(buffer);
+	std::string positionData = split_string(machineData, '|')[1];
+	auto betterPositionData = split_string(positionData.substr(5), ',');
+
+	double x = stod(betterPositionData[0]) + 399.0;
+	double y = stod(betterPositionData[1]) + 349.0;
+	double z = stod(betterPositionData[2]) + 104.0;
+
+	GUI::Instance()->get_label("x").set_text(std::format("X: {0:.2f}", x));
+	GUI::Instance()->get_label("y").set_text(std::format("Y: {0:.2f}", y));
+	GUI::Instance()->get_label("z").set_text(std::format("Z: {0:.2f}", z));
+
+	delayTimer = 100;	
 }
 
 void MotorController::connect() {
@@ -183,6 +207,7 @@ void MotorController::unlock() {
 
 void MotorController::soft_reset() {
 	gcodeBuffer.push("^X");
+	hasBeenHomed = false;
 }
 
 void MotorController::go_home() {
