@@ -42,6 +42,7 @@ constexpr char STARTING_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w K
 int get_array_index(int rank, int file);
 int get_rank(int array_index);
 int get_file(int array_index);
+int square_distance(chess::Square a, chess::Square b);
 
 int pop_lsb(U64& bitboard);
 void set_bit(U64& bitboard, int index);

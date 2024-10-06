@@ -10,82 +10,65 @@ void MotorController::start() {
 	if (!hasBeenHomed) home_machine();
 	this->gui = GUI::Instance();
 	this->board = GameManager::Instance()->get_board();
-	this->delayTimer = DELAY_THRESHOLD;
+	this->delayTimer = 0;
 }
 
 void MotorController::update() {
 	isWaiting = should_wait();
 
-	if (isWaiting || gcodeBuffer.empty() || !arduino.isDeviceOpen())
+	if (isWaiting || !arduino.isDeviceOpen())
 		return;
+	
+	// Check if any commands need to be sent, otherwise send polling every 100 ticks
+	if (!gcodeBuffer.empty()){
+		std::string gcodeCommand = gcodeBuffer.front() + "\n";
+	
+		arduino.writeString(gcodeCommand.c_str());
+		wait_for_response();
 
-	std::string gcodeCommand = gcodeBuffer.front() + "\n";
-	bool isDelay = toupper(gcodeCommand[0]) == 'D';
-	if (isDelay) {
-		int delayAmount = stoi(gcodeCommand.substr(2));
-		wait_for_response(delayAmount);
+		gcodeBuffer.pop();
 	}
 	else {
-		arduino.writeString(gcodeCommand.c_str());
-		wait_for_response(0);
+		poll_machine_state();
 	}
-
-	gcodeBuffer.pop();
 }
 
 void MotorController::graphics() {
-	if (!arduino.isDeviceOpen())
-		return;
-	
-	if (delayTimer > 0){
-		delayTimer--;
-		return;
-	}
-
-	arduino.writeString("?");
-
-	char buffer[100];
-	arduino.readString(buffer, '>', 100);
-
-	std::string machineData = std::string(buffer);
-	std::string positionData = split_string(machineData, '|')[1];
-	auto betterPositionData = split_string(positionData.substr(5), ',');
-
-	double x = stod(betterPositionData[0]) + 399.0;
-	double y = stod(betterPositionData[1]) + 349.0;
-	double z = stod(betterPositionData[2]) + 104.0;
-
-	GUI::Instance()->get_label("x").set_text(std::format("X: {0:.2f}", x));
-	GUI::Instance()->get_label("y").set_text(std::format("Y: {0:.2f}", y));
-	GUI::Instance()->get_label("z").set_text(std::format("Z: {0:.2f}", z));
-
-	delayTimer = 100;	
+	gui->get_label("x").set_text(std::to_string(currentX));
+	gui->get_label("y").set_text(std::to_string(currentY));
+	gui->get_label("z").set_text(std::to_string(currentZ));
 }
 
 void MotorController::connect() {
 	char isOpen = arduino.openDevice(ARDUINO_PORT, BAUD_RATE);
 	if (isOpen != 1) return;
 	
-	GUI::Instance()->get_label("machineConnected").set_text("Connected");
+	gui->get_label("machineConnected").set_text("Connected");
 
 	arduino.writeString("\r\n\r\n");
 	arduino.flushReceiver();
-	wait_for_response(0);
+	wait_for_response();
 }
 
 bool MotorController::should_wait() {
 	if (!isWaiting) return false;
 
-	if (delayTimer > 0) {
-		delayTimer -= 1;
-		return true;
-	}
-
 	if (arduino.available() <= 0) return true;
 		
 	char buffer[1000];
 	arduino.readString(buffer, '\r', 1000);
-	std::cout << buffer << "\n";
+
+	std::string response(buffer);
+	std::regex rgx("<.*MPos:([0-9.-]+),([0-9.-]+),([0-9.-]+).*>");
+	std::smatch match;
+
+	if (std::regex_search(response, match, rgx)) {
+		currentX = std::stof(match[1].str());
+		currentY = std::stof(match[2].str());
+		currentZ = std::stof(match[3].str());
+	}
+
+	std::cout << response << "\n";
 
 	arduino.flushReceiver();
 
@@ -152,7 +135,7 @@ void MotorController::putdown_piece(PieceType piece) {
 }
 
 void MotorController::move_piece(Square from, Square to, PieceType piece, bool castlingOverride) {
-	bool fullyLiftPiece = castlingOverride || (piece == PieceType::KNIGHT);
+	bool fullyLiftPiece = castlingOverride || (piece == PieceType::KNIGHT) || (Square::distance(from, to) > 2);
 	move_to_square(from);
 	pickup_piece(piece, fullyLiftPiece);
 	if (fullyLiftPiece)
@@ -178,6 +161,7 @@ void MotorController::move_to_square(Square square) {
 void MotorController::move_to_square(chess::Square square, chess::PieceType piece) {
 	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH);
 	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH);
+
 	float z = get_z_height(piece) - Z_PICKUP_OFFSET;
 	move_to(x, y, z);
 }
@@ -210,13 +194,28 @@ void MotorController::soft_reset() {
 	hasBeenHomed = false;
 }
 
+void MotorController::delay(int milliseconds) {
+	float seconds = milliseconds / 1000.0f;
+    std::string delayCommand = std::format("G4 P{}", seconds);
+    gcodeBuffer.push(delayCommand);
+}
+
+void MotorController::poll_machine_state() {
+	if (delayTimer <= 0){
+		arduino.writeString("?");
+		delayTimer = DELAY_THRESHOLD;
+	}
+	else {
+		delayTimer -= 1;
+	}
+}
+
 void MotorController::go_home() {
 	gcodeBuffer.push("G28");
 }
 
-void MotorController::wait_for_response(int postResponseDelay) {
+void MotorController::wait_for_response() {
 	isWaiting = true;
-	delayTimer = postResponseDelay;
 }
 
 float MotorController::get_z_height(PieceType piece) {

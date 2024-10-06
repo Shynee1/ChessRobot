@@ -5,35 +5,35 @@ set(CMAKE_CXX_STANDARD            20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_EXTENSIONS        True)
 
+set(ASSETS_FOLDER ${CMAKE_SOURCE_DIR}/assets)
+set(ASSETS_DESTINATION ${CMAKE_BINARY_DIR}/assets)
+
 find_package(Boost REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(glaze REQUIRED)
 
+# Get all cpp files from /src folder
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
+# Create executable with cpp files
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Link header files
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${CMAKE_SOURCE_DIR}/headers
     ${CMAKE_SOURCE_DIR}/external
 )
 
-set(link_src "${CMAKE_SOURCE_DIR}/assets")
-if(UNIX AND NOT APPLE) 
-    set(link_dst "${CMAKE_CURRENT_BINARY_DIR}/assets") 
-else() 
-    set(link_dst "${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/assets") 
-endif() 
-add_custom_command( 
-    TARGET ${PROJECT_NAME} 
-    POST_BUILD COMMAND ${CMAKE_COMMAND} 
-        -E create_symlink ${link_src} ${link_dst} 
-    DEPENDS ${link_dst} 
-    COMMENT "symbolic link ${link_src} => ${link_dst}" 
+# Copy assets folder to build directory
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${ASSETS_FOLDER} ${ASSETS_DESTINATION}
 )
 
+# Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     glaze::glaze 
     SDL2::SDL2-static

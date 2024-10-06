@@ -1,4 +1,5 @@
 #include "utility.hpp"
+#include <cmath>
 
 int get_array_index(int rank, int file) {
 	return rank * 8 + file;
