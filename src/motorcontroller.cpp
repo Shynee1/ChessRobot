@@ -167,15 +167,15 @@ void MotorController::move_to_square(chess::Square square, chess::PieceType piec
 }
 
 void MotorController::move_to(float x, float y, float z) {
-	gcodeBuffer.push(std::format("G00 X{} Y{} Z{}", x, y, z));
+	gcodeBuffer.push(fmt::format("G00 X{} Y{} Z{}", x, y, z));
 }
 
 void MotorController::move_to(float x, float y) {
-	gcodeBuffer.push(std::format("G00 X{} Y{}", x, y));
+	gcodeBuffer.push(fmt::format("G00 X{} Y{}", x, y));
 }
 
 void MotorController::move_to(float z) {
-	gcodeBuffer.push(std::format("G00 Z{}", z));
+	gcodeBuffer.push(fmt::format("G00 Z{}", z));
 }
 
 void MotorController::home_machine() {
@@ -196,7 +196,7 @@ void MotorController::soft_reset() {
 
 void MotorController::delay(int milliseconds) {
 	float seconds = milliseconds / 1000.0f;
-    std::string delayCommand = std::format("G4 P{}", seconds);
+    std::string delayCommand = fmt::format("G4 P{}", seconds);
     gcodeBuffer.push(delayCommand);
 }
 

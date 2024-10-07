@@ -1,12 +1,18 @@
 #pragma once
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <filesystem>
-#include <map>
 #include "utility.hpp"
 #include "window.hpp"
+#include <filesystem>
+#include <boost/filesystem.hpp>
+#include <map>
 
+#if defined(_WIN64)
+	#define FILEPATH_SEPARATOR "\\"
+#elif defined (_WIN32)
+	#define FILEPATH_SEPARATOR "\\"
+#else
+	#define FILEPATH_SEPARATOR "/"
+#endif
+	
 class AssetPool {
 private:
 	static std::shared_ptr<AssetPool> s_instance;
@@ -22,4 +28,5 @@ public:
 	TTF_Font* get_font(std::string filename);
 	TTF_Font* add_font(std::string filepath, int size);
 	void load_font_sizes(std::string filepath, std::vector<int> sizes);
+	std::string get_absolute_path(std::string relativePath);
 };

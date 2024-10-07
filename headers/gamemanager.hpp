@@ -33,7 +33,7 @@ public:
         
         }   
 
-        fatal_log(std::format("ERROR: Cannot get component '{}'", typeid(T).name()));
+        fatal_log(fmt::format("ERROR: Cannot get component '{}'", typeid(T).name()));
         return nullptr;
     }
     std::shared_ptr<chess::Board> get_board();

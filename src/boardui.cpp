@@ -1,4 +1,4 @@
-#include "BoardUI.hpp"
+#include "boardui.hpp"
 
 using namespace chess;
 

@@ -2,7 +2,7 @@
 #include <SDL_image.h>
 #include <SDL.h>
 #include "utility.hpp"
-#include "AssetPool.hpp"
+#include "assetpool.hpp"
 
 class Spritesheet {
 private:

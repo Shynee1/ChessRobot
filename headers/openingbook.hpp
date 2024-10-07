@@ -13,8 +13,8 @@ struct BookElement {
 };
 
 typedef std::vector<std::deque<BookElement>> Book;
-constexpr char BOOK_FP[] = "assets\\data\\book.bin";
-constexpr char GAMES_FP[] = "assets\\data\\games.txt";
+constexpr char BOOK_FP[] = "assets/data/book.bin";
+constexpr char GAMES_FP[] = "assets/data/games.txt";
 constexpr int MAX_MOVES = 15;
 
 class OpeningBook {

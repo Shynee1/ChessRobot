@@ -9,7 +9,6 @@
 #include <bitset>
 #include <bit>
 #include <cmath>
-#include <format>
 #include <algorithm>
 #include <queue>
 #include <stack>
@@ -21,6 +20,7 @@
 #include <SDL_ttf.h>
 #include <chess.hpp>
 #include <serialib.hpp>
+#include <fmt/core.h>
 
 typedef std::uint64_t U64;
 
@@ -57,6 +57,7 @@ int worldToArray(SDL_Point& worldPos);
 SDL_Point arrayToWorld(int arrayPos);
 
 std::vector<std::string> split_string(std::string str, char delimiter);
+std::string replaceAll(std::string str, std::string what, std::string with);
 int signum(int x);
 
 void fatal_log(std::string log);

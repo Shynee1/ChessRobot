@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29.6)
+cmake_minimum_required(VERSION 3.25.0)
 project(ChessRobot)
 
 set(CMAKE_CXX_STANDARD            20)
@@ -13,6 +13,7 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(glaze REQUIRED)
+find_package(fmt REQUIRED)
 
 # Get all cpp files from /src folder
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -41,4 +42,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     SDL2_image::SDL2_image-static
     SDL2_ttf::SDL2_ttf-static
     Boost::filesystem
+    fmt::fmt
 )

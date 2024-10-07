@@ -109,28 +109,28 @@ void GUI::graphics() {
 
 void GUI::add_button(std::string id, Button button) {
 	if (buttons.count(id) != 0)
-        fatal_log(std::format("ERROR: Button with id '{}' already exists", id));
+        fatal_log(fmt::format("ERROR: Button with id '{}' already exists", id));
 
 	buttons[id] = button;
 }
 
 void GUI::add_label(std::string id, Label label) {
 	if (labels.count(id) != 0)
-        fatal_log(std::format("ERROR: Label with id '{}' already exists", id));
+        fatal_log(fmt::format("ERROR: Label with id '{}' already exists", id));
 
 	labels[id] = label;
 }
 
 Button& GUI::get_button(std::string id) {
     if (buttons.count(id) == 0)
-        fatal_log(std::format("ERROR: No button with id '{}' found", id));
+        fatal_log(fmt::format("ERROR: No button with id '{}' found", id));
 
 	return buttons[id];
 }
 
 Label& GUI::get_label(std::string id) {
     if (labels.count(id) == 0)
-        fatal_log(std::format("ERROR: No label with id '{}' found", id));
+        fatal_log(fmt::format("ERROR: No label with id '{}' found", id));
 
 	return labels[id];
 }

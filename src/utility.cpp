@@ -112,6 +112,17 @@ std::vector<std::string> split_string(std::string str, char delimiter) {
 	return res;
 }
 
+std::string replaceAll(std::string str, std::string what, std::string with) {
+	size_t pos = str.find(what);
+	
+	while (pos != std::string::npos){
+		str.replace(pos, what.size(), with);
+		pos = str.find(what, pos + with.size());
+	}
+	
+	return str;
+}
+
 int signum(int x) {
 	if (x > 0)
 		return 1;

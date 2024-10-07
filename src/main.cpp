@@ -3,7 +3,7 @@
 #include "assetpool.hpp"
 #include "gui.hpp"
 #include "gamemanager.hpp"
-#include "BoardUI.hpp"
+#include "boardui.hpp"
 #include "button.hpp"
 #include "mouseinput.hpp"
 #include "motorcontroller.hpp"
@@ -18,11 +18,11 @@ int main (int argc, char* args[]){
 	window->create_window("Chess", 1280, 720);
 
 	auto assetPool = AssetPool::Instance();
-	assetPool->load_all_textures("assets\\textures"); 
+	assetPool->load_all_textures("assets/textures"); 
 
 	std::vector<int> fontSizes = {38, 21, 24, 15, 31, 9};
-	assetPool->add_font("assets\\fonts\\arial.ttf", 22);
-	assetPool->load_font_sizes("assets\\fonts\\panton.ttf", fontSizes);
+	assetPool->add_font("assets/fonts/arial.ttf", 22);
+	assetPool->load_font_sizes("assets/fonts/panton.ttf", fontSizes);
 
 	auto gui = GUI::Instance();
 	gui->create_ui();
