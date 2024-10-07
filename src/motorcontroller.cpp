@@ -34,9 +34,9 @@ void MotorController::update() {
 }
 
 void MotorController::graphics() {
-	gui->get_label("x").set_text(std::to_string(currentX));
-	gui->get_label("y").set_text(std::to_string(currentY));
-	gui->get_label("z").set_text(std::to_string(currentZ));
+	gui->get_label("x").set_text(fmt::format("X: {}", std::to_string(currentX)));
+	gui->get_label("y").set_text(fmt::format("Y: {}", std::to_string(currentY)));
+	gui->get_label("z").set_text(fmt::format("Z: {}", std::to_string(currentZ)));
 }
 
 void MotorController::connect() {

@@ -4,6 +4,7 @@ sdl_image/2.6.3
 sdl_ttf/2.22.0
 glaze/2.9.0
 boost/1.85.0
+fmt/11.0.2
 [generators]
 CMakeDeps
 CMakeToolchain
