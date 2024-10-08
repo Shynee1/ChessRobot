@@ -13,6 +13,7 @@ Window::Window(){
 	this->title = "Window";
 	this->screenDimensions = {WORLD_WIDTH, WORLD_HEIGHT};
 	this->screenRatios = {1, 1};
+	Label::set_screen_ratios(screenRatios);
 }
 
 void Window::create_window(std::string title, int screenWidth, int screenHeight) {
@@ -20,6 +21,7 @@ void Window::create_window(std::string title, int screenWidth, int screenHeight)
 	this->screenDimensions = {screenWidth, screenHeight};
 	this->screenRatios.x = (double) screenWidth / WORLD_WIDTH;
 	this->screenRatios.y = (double) screenHeight / WORLD_HEIGHT;
+	Label::set_screen_ratios(screenRatios);
 	this->isRunning = true;
 
 	try {
@@ -76,6 +78,17 @@ SDL_Texture* Window::load_texture(const char* filepath) {
 	return p_texture;
 }
 
+TTF_Font* Window::load_font(const char* filepath, int size) {
+	int rescaledSize = size * screenRatios.x;
+	TTF_Font* font = NULL;
+	font = TTF_OpenFont(filepath, rescaledSize);
+	
+	if (font == NULL)
+		fatal_log(fmt::format("ERROR: Failed to create texture at {}\n{}\n", filepath, SDL_GetError()));
+	
+	return font;
+}
+
 void Window::render_object(RenderObject* p_obj) {
 	SDL_Rect resized = world_to_screen(*p_obj->dst);
 	SDL_RenderCopy(renderer, p_obj->base_texture, p_obj->src.get(), &resized);
@@ -111,14 +124,12 @@ void Window::render_label(Label label) {
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textSurface);
 
 	SDL_Rect dst;
-	dst.x = label.get_dimensions().x;
-	dst.y = label.get_dimensions().y;
+	dst.x = label.get_dimensions().x * screenRatios.x;
+	dst.y = label.get_dimensions().y * screenRatios.y;
 	dst.w = textSurface->w;
 	dst.h = textSurface->h;
 
-	SDL_Rect resized = world_to_screen(dst);
-
-	SDL_RenderCopy(renderer, texture, NULL, &resized);
+	SDL_RenderCopy(renderer, texture, NULL, &dst);
 	SDL_FreeSurface(textSurface);
 	SDL_DestroyTexture(texture);
 }
