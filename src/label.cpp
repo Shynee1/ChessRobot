@@ -1,9 +1,14 @@
 #include "label.hpp"
 
+SDL_FPoint Label::screenRatios(1, 1);
+
 Label::Label(SDL_Point pos, std::string text, TTF_Font* font) {
     this->dimensions.x = pos.x;
     this->dimensions.y = pos.y;
     TTF_SizeText(font, text.c_str(), &this->dimensions.w, &this->dimensions.h);
+    
+    this->dimensions.w *= (1 / Label::screenRatios.x);
+    this->dimensions.h *= (1 / Label::screenRatios.y);
 
     this->text = text;
     this->font = font;
@@ -14,6 +19,9 @@ Label::Label(SDL_Point pos, std::string text, TTF_Font* font, SDL_Color color) {
     this->dimensions.x = pos.x;
     this->dimensions.y = pos.y;
     TTF_SizeText(font, text.c_str(), &this->dimensions.w, &this->dimensions.h);
+    
+    this->dimensions.w *= (1 / Label::screenRatios.x);
+    this->dimensions.h *= (1 / Label::screenRatios.y);
 
     this->text = text;
     this->font = font;

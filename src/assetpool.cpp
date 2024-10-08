@@ -77,7 +77,7 @@ TTF_Font* AssetPool::add_font(std::string filepath, int size) {
 	std::string filename = filepath.substr(startIndex, endIndex - startIndex) + sizeString;
 
 	if (m_fonts[filename] == NULL)
-		m_fonts[filename] = TTF_OpenFont(filepath.c_str(), size);
+		m_fonts[filename] = Window::Instance()->load_font(filepath.c_str(), size);
 	
 	return m_fonts[filename];
 }

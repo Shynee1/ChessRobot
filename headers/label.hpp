@@ -1,8 +1,11 @@
 #pragma once
 #include "utility.hpp"
 
+
+
 class Label {
 private:
+    static SDL_FPoint screenRatios;
     SDL_Rect dimensions;
     std::string text;
     TTF_Font* font;
@@ -19,4 +22,7 @@ public:
     SDL_Rect get_dimensions();
     TTF_Font* get_font();
     SDL_Color get_color();
+    static void set_screen_ratios(SDL_FPoint screenRatios) {
+        Label::screenRatios = screenRatios;
+    }
 };

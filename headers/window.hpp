@@ -31,6 +31,7 @@ private:
 	SDL_Rect world_to_screen(SDL_Rect& rect);
 public:
 	SDL_Texture* load_texture(const char* filepath);
+	TTF_Font* load_font(const char* filepath, int size);
 	void render_object(RenderObject *p_obj);
 	void render_texture(SDL_Texture *p_texture, int x, int y);
 	void render_color(SDL_Rect rect, SDL_Color color);
