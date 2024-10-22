@@ -23,7 +23,6 @@ void MotorController::update() {
 	if (isWaiting)
 		return;
 	
-	// Check if any commands need to be sent, otherwise send polling every 100 ticks
 	if (!gcodeBuffer.empty()){
 		std::string gcodeCommand = gcodeBuffer.front() + "\n";
 	

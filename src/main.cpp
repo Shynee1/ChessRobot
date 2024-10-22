@@ -15,11 +15,7 @@ int main (int argc, char* args[]){
 	srand(time(0));
 
 	auto window = Window::Instance();
-<<<<<<< HEAD
-	window->create_window("Chess", 1840, 1035);
-=======
 	window->create_window("Chess");
->>>>>>> 57543030250f2d10ab368575df38c6482c76aab7
 
 	auto assetPool = AssetPool::Instance();
 	assetPool->load_all_textures("assets/textures"); 
