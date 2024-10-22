@@ -14,9 +14,13 @@ void MotorController::start() {
 }
 
 void MotorController::update() {
+	if (!arduino.isDeviceOpen())
+		return;
+		
+	poll_machine_state();
 	isWaiting = should_wait();
 
-	if (isWaiting || !arduino.isDeviceOpen())
+	if (isWaiting)
 		return;
 	
 	// Check if any commands need to be sent, otherwise send polling every 100 ticks
@@ -28,22 +32,19 @@ void MotorController::update() {
 
 		gcodeBuffer.pop();
 	}
-	else {
-		poll_machine_state();
-	}
 }
 
 void MotorController::graphics() {
-	gui->get_label("x").set_text(fmt::format("X: {}", std::to_string(currentX)));
-	gui->get_label("y").set_text(fmt::format("Y: {}", std::to_string(currentY)));
-	gui->get_label("z").set_text(fmt::format("Z: {}", std::to_string(currentZ)));
+	gui->get_label("x").set_text(fmt::format("X: {:.3f}", currentX));
+	gui->get_label("y").set_text(fmt::format("Y: {:.3f}", currentY));
+	gui->get_label("z").set_text(fmt::format("Z: {:.3f}", currentZ));
 }
 
 void MotorController::connect() {
 	char isOpen = arduino.openDevice(ARDUINO_PORT, BAUD_RATE);
 	if (isOpen != 1) return;
 	
-	gui->get_label("machineConnected").set_text("Connected");
+	GUI::Instance()->get_label("machineConnected").set_text("Connected");
 
 	arduino.writeString("\r\n\r\n");
 	arduino.flushReceiver();
@@ -56,17 +57,8 @@ bool MotorController::should_wait() {
 	if (arduino.available() <= 0) return true;
 		
 	char buffer[1000];
-	arduino.readString(buffer, '\r', 1000);
-
+	arduino.readString(buffer, '\r', 1000); 
 	std::string response(buffer);
-	std::regex rgx("<.*MPos:([0-9.-]+),([0-9.-]+),([0-9.-]+).*>");
-	std::smatch match;
-
-	if (std::regex_search(response, match, rgx)) {
-		currentX = std::stof(match[1].str());
-		currentY = std::stof(match[2].str());
-		currentZ = std::stof(match[3].str());
-	}
 
 	std::cout << response << "\n";
 
@@ -123,8 +115,11 @@ void MotorController::pickup_piece(PieceType piece, bool fullyLiftPiece) {
 	float z = get_z_height(piece);
 	move_to(z);
 	set_electromagnet(true);
-	if (fullyLiftPiece) 
+	delay(PICKUP_DELAY_AMOUNT);
+	if (fullyLiftPiece) {
 		move_to(Z_MIN);
+		delay(PICKUP_DELAY_AMOUNT);
+	}
 }
 
 void MotorController::putdown_piece(PieceType piece) {
@@ -203,6 +198,19 @@ void MotorController::delay(int milliseconds) {
 void MotorController::poll_machine_state() {
 	if (delayTimer <= 0){
 		arduino.writeString("?");
+		
+		char buffer[1000];
+		arduino.readString(buffer, '>', 1000, 100); 
+		
+		std::string response(buffer);
+		std::regex rgx("<.*MPos:([0-9.-]+),([0-9.-]+),([0-9.-]+).*>");
+		std::smatch match;
+
+		if (std::regex_search(response, match, rgx)) {
+			currentX = std::stod(match[1].str());
+			currentY = std::stod(match[2].str());
+			currentZ = std::stod(match[3].str());
+		}
 		delayTimer = DELAY_THRESHOLD;
 	}
 	else {

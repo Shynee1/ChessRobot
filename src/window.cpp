@@ -19,8 +19,13 @@ Window::Window(){
 void Window::create_window(std::string title, int screenWidth, int screenHeight) {
 	this->title = title;
 	this->screenDimensions = {screenWidth, screenHeight};
+<<<<<<< HEAD
 	this->screenRatios.x = (double) screenWidth / WORLD_WIDTH;
 	this->screenRatios.y = (double) screenHeight / WORLD_HEIGHT;
+=======
+	this->screenRatios.x = (double) screenDimensions.x / WORLD_WIDTH;
+	this->screenRatios.y = (double) screenDimensions.y / WORLD_HEIGHT;
+>>>>>>> 57543030250f2d10ab368575df38c6482c76aab7
 	Label::set_screen_ratios(screenRatios);
 	this->isRunning = true;
 
@@ -33,6 +38,29 @@ void Window::create_window(std::string title, int screenWidth, int screenHeight)
 		exit(EXIT_FAILURE);
 	}
 }
+
+void Window::create_window(std::string title) {
+	this->title = title;
+	this->screenDimensions = {WORLD_WIDTH, WORLD_HEIGHT};
+
+	try {
+		sdl_init();
+		window_init();
+	}
+	catch (std::exception& e) {
+		std::cerr << e.what() << "\n";
+		exit(EXIT_FAILURE);
+	}
+	
+	SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	SDL_GetWindowSize(window, &screenDimensions.x, &screenDimensions.y);
+	
+	this->screenRatios.x = (double) screenDimensions.x / WORLD_WIDTH;
+	this->screenRatios.y = (double) screenDimensions.y / WORLD_HEIGHT;
+	Label::set_screen_ratios(screenRatios);
+	this->isRunning = true;
+}
+
 
 void Window::sdl_init() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)

@@ -25,6 +25,7 @@ public:
 	static std::shared_ptr<Window> Instance();
 	Window();
 	void create_window(std::string title, int screenWidth, int screenHeight);
+	void create_window(std::string title);
 private:
 	void sdl_init();
 	void window_init();
