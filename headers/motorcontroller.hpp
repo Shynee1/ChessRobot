@@ -4,7 +4,7 @@
 #include "component.hpp"
 #include <regex>
 
-constexpr char ARDUINO_PORT[] = "COM4";
+constexpr char ARDUINO_PORT[] = "/dev/ttyACM0";
 constexpr int BAUD_RATE = 115200;
 
 constexpr float BOARD_OFFSET_X = 66;
@@ -14,9 +14,10 @@ constexpr float TAKEN_PIECES_Y = 170;
 constexpr float SQUARE_WIDTH = 45;
 constexpr float PIECE_HEIGHT[7] = { 39.8, 49.8, 61.7, 42.7, 76.1, 83.5, 0 };
 constexpr float Z_MAX = 150;
-constexpr float Z_MIN = 10;
+constexpr float Z_MIN = 10;                                                     
 constexpr float Z_PICKUP_OFFSET = 50;
-constexpr int 	DELAY_THRESHOLD = 100;
+constexpr int 	DELAY_THRESHOLD = 10;
+constexpr int 	PICKUP_DELAY_AMOUNT = 100;
 
 class MotorController : public Component {
 private:
@@ -28,10 +29,10 @@ private:
 	bool electroMagnetOn = false;
 	bool isWaiting = false;
 	bool hasBeenHomed = false;
-	int delayTimer = 0;
-	int currentX = 0;
-	int currentY = 0;
-	int currentZ = 0;
+	int delayTimer = 100;
+	double currentX = 0;
+	double currentY = 0;
+	double currentZ = 0;
 public:
 	~MotorController();
 	void start();
