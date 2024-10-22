@@ -72,6 +72,7 @@ void GUI::create_ui() {
 	add_label("x", {{TEXT_PADDING_X, 412}, "X: 0.00", arial, LIGHT_GREY});
 	add_label("y", {{TEXT_PADDING_X, 451}, "Y: 0.00", arial, LIGHT_GREY});
 	add_label("z", {{TEXT_PADDING_X, 490}, "Z: 0.00", arial, LIGHT_GREY});
+	add_label("shameless_plug", {{25, 681}, "Created by Jack Ford", arial, LIGHT_GREY});
 }
 
 void GUI::update() {

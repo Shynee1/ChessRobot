@@ -2,10 +2,11 @@
 
 using namespace chess;
 
-BoardInput::BoardInput(chess::Board* board, BoardUI* ui) {
-	this->board = board;
-	this->ui = ui;
-	this->previousBoard = fen_to_bitboard(board->getFen());
+void BoardInput::start() {
+	this->board = GameManager::Instance()->get_board();
+	this->ui = GameManager::Instance()->get_component<BoardUI>();
+	this->currentBoard = fen_to_bitboard(board->getFen());
+	this->previousBoard = currentBoard;
 	movegen::legalmoves(legalMoves, *board);
 
 	char isOpen = serial.openDevice(SERIAL_PORT, SERIAL_BAUD_RATE);
@@ -14,10 +15,6 @@ BoardInput::BoardInput(chess::Board* board, BoardUI* ui) {
 	else
 		std::cerr << "ERROR: Could not connect to " << SERIAL_PORT << "\n";
 	serial.flushReceiver();
-
-
-	bitboardData.push(fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R4BNR w KQkq - 0 1"));
-	bitboardData.push(fen_to_bitboard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R1K2BNR w KQkq - 0 1"));
 }
 
 BoardInput::~BoardInput() {
@@ -27,11 +24,14 @@ BoardInput::~BoardInput() {
 void BoardInput::update() {
 	if (board->sideToMove() != Color::WHITE) return;
 
-	U64 currentBoard = read_latest_bitboard();
+	if (!serial.isDeviceOpen()) return;
 
-	std::cout << std::bitset<64>(currentBoard) << "\n";
-	/*
-	if (currentBoard == previousBoard || currentBoard == 0) return;
+	bool newData = read_latest_bitboard();
+	
+	if (!newData) return;
+
+	std::cout << "Current:  " << std::bitset<64>(currentBoard) << std::endl;
+	std::cout << "Previous: " << std::bitset<64>(previousBoard) << std::endl;
 	
 	movegen::legalmoves(legalMoves, *board);
 
@@ -48,14 +48,20 @@ void BoardInput::update() {
 	}
 
 	previousBoard = currentBoard;
-	*/
+}
+
+void BoardInput::graphics() {
+
 }
 
 void BoardInput::handle_piece_putdown(int squarePos) {
 	if (board->sideToMove() != Color::WHITE 
 		|| pickedUpPieces.size() > 2 
-		|| pickedUpPieces.size() <= 0) 
+		|| pickedUpPieces.size() <= 0) {
+			pickedUpPieces.clear();
 			return;
+		}
+			
 
 	Move move = NULL;	
 	if (pickedUpPieces.size() == 1) 
@@ -66,8 +72,12 @@ void BoardInput::handle_piece_putdown(int squarePos) {
 		else move = handle_en_passant(squarePos);
 	}
 
-	if (move != NULL)
+	if (move != NULL){
 		board->makeMove(move);
+		GameManager::Instance()->get_opening_book()->updateMoves(board->hash());
+	} 
+
+	pickedUpPieces.clear();
 
 	std::cout << move << "\n";
 }
@@ -127,17 +137,21 @@ Move BoardInput::get_legal_move(int from, int to) {
 	return NULL;
 }
 
-U64 BoardInput::read_latest_bitboard() {
-	U64 bitboard = 0ULL;
+bool BoardInput::read_latest_bitboard() {
 	const int numBytes = 8;
+
+	if (serial.available() <= 0 )
+		return false;
 
 	unsigned char buffer[numBytes];
 	serial.readBytes(buffer, numBytes);
 
+	currentBoard = 0ULL;
+
 	for (int i = 0; i < numBytes; i++) {
-		bitboard |= (U64) buffer[i] << (i * 8);
+		currentBoard |= (U64) buffer[i] << (i * 8);
 	}
 
-	return bitboard;
+	return true;
 }
 

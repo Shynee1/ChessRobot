@@ -28,7 +28,6 @@ void MotorController::update() {
 	
 		arduino.writeString(gcodeCommand.c_str());
 		wait_for_response();
-
 		gcodeBuffer.pop();
 	}
 }

@@ -6,6 +6,7 @@
 #include "boardui.hpp"
 #include "button.hpp"
 #include "mouseinput.hpp"
+#include "boardinput.hpp"
 #include "motorcontroller.hpp"
 #include "opponent.hpp"
 
@@ -32,6 +33,7 @@ int main (int argc, char* args[]){
 	gameManager->add_component<MouseInput>();
 	gameManager->add_component<MotorController>();
 	gameManager->add_component<Opponent>();
+	gameManager->add_component<BoardInput>();
 
 	register_button_callbacks();
 
