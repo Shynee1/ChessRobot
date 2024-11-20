@@ -59,5 +59,6 @@ SDL_Point arrayToWorld(int arrayPos);
 std::vector<std::string> split_string(std::string str, char delimiter);
 std::string replaceAll(std::string str, std::string what, std::string with);
 int signum(int x);
+std::vector<std::string> read_all_serial_data(serialib& arduino);
 
 void fatal_log(std::string log);

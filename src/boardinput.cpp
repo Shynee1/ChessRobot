@@ -9,11 +9,6 @@ void BoardInput::start() {
 	this->previousBoard = currentBoard;
 	movegen::legalmoves(legalMoves, *board);
 
-	char isOpen = serial.openDevice(SERIAL_PORT, SERIAL_BAUD_RATE);
-	if (isOpen == 1)
-		std::cout << "Connection successfully opened to " << SERIAL_PORT << "\n";
-	else
-		std::cerr << "ERROR: Could not connect to " << SERIAL_PORT << "\n";
 	serial.flushReceiver();
 }
 
@@ -30,8 +25,8 @@ void BoardInput::update() {
 	
 	if (!newData) return;
 
-	std::cout << "Current:  " << std::bitset<64>(currentBoard) << std::endl;
 	std::cout << "Previous: " << std::bitset<64>(previousBoard) << std::endl;
+	std::cout << "Current:  " << std::bitset<64>(currentBoard)  << std::endl;
 	
 	movegen::legalmoves(legalMoves, *board);
 
@@ -48,36 +43,43 @@ void BoardInput::update() {
 	}
 
 	previousBoard = currentBoard;
+	std::cout << std::endl;
 }
 
 void BoardInput::graphics() {
 
 }
 
-void BoardInput::handle_piece_putdown(int squarePos) {
-	if (board->sideToMove() != Color::WHITE 
-		|| pickedUpPieces.size() > 2 
-		|| pickedUpPieces.size() <= 0) {
-			pickedUpPieces.clear();
-			return;
-		}
-			
+void BoardInput::connect() {
+	char isOpen = serial.openDevice(BOARD_ARDUINO_PORT, BOARD_BAUD_RATE);
+	if (isOpen != 1) return;
+	
+	GUI::Instance()->get_label("boardConnected").set_text("Connected");
 
+	serial.flushReceiver();
+}
+
+void BoardInput::handle_piece_putdown(int squarePos) {
 	Move move = NULL;	
+	
 	if (pickedUpPieces.size() == 1) 
 		move = handle_move(squarePos);
-	else {
+	else if (pickedUpPieces.size() == 2){
+		// Checks whether squarePos is in pickedUpPieces
 		int count = std::count(pickedUpPieces.begin(), pickedUpPieces.end(), squarePos);
 		if (count > 0) move = handle_capture(squarePos);
 		else move = handle_en_passant(squarePos);
 	}
-
-	if (move != NULL){
-		board->makeMove(move);
-		GameManager::Instance()->get_opening_book()->updateMoves(board->hash());
-	} 
-
+	else 
+		std::cout << "WARNING: Size of picked-up-pieces array should never be " << pickedUpPieces.size() << "\n";
+	
 	pickedUpPieces.clear();
+
+	if (move == NULL)
+		return;
+
+	board->makeMove(move);
+	GameManager::Instance()->get_opening_book()->updateMoves(board->hash());
 
 	std::cout << move << "\n";
 }

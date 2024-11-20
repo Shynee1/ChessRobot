@@ -10,7 +10,7 @@ void MotorController::start() {
 	if (!hasBeenHomed) home_machine();
 	this->gui = GUI::Instance();
 	this->board = GameManager::Instance()->get_board();
-	this->delayTimer = 0;
+	this->delayTimer = DELAY_THRESHOLD;
 }
 
 void MotorController::update() {
@@ -18,18 +18,17 @@ void MotorController::update() {
 		return;
 		
 	poll_machine_state();
-	isWaiting = should_wait();
+	auto output = read_all_serial_data(arduino);
+	isWaiting = parse_serial_data(output);
 
-	if (isWaiting)
+	if (isWaiting || gcodeBuffer.empty())
 		return;
 	
-	if (!gcodeBuffer.empty()){
-		std::string gcodeCommand = gcodeBuffer.front() + "\n";
-	
-		arduino.writeString(gcodeCommand.c_str());
-		wait_for_response();
-		gcodeBuffer.pop();
-	}
+	std::string gcodeCommand = gcodeBuffer.front() + "\n";
+	std::cout << "Command: " << gcodeCommand; 
+	arduino.writeString(gcodeCommand.c_str());
+	wait_for_response();
+	gcodeBuffer.pop();
 }
 
 void MotorController::graphics() {
@@ -49,20 +48,25 @@ void MotorController::connect() {
 	wait_for_response();
 }
 
-bool MotorController::should_wait() {
-	if (!isWaiting) return false;
+bool MotorController::parse_serial_data(std::vector<std::string> serialData) {
+	bool responseStringFound = false;
 
-	if (arduino.available() <= 0) return true;
-		
-	char buffer[1000];
-	arduino.readString(buffer, '\r', 1000); 
-	std::string response(buffer);
+	std::regex rgx("<.*MPos:([0-9.-]+),([0-9.-]+),([0-9.-]+).*>");
+	std::smatch match;
 
-	std::cout << response << "\n";
+	for (std::string& s : serialData) {
+		if (std::regex_search(s, match, rgx)){
+			currentX = std::stod(match[1].str()) + 397;
+			currentY = std::stod(match[2].str()) + 350;
+			currentZ = std::stod(match[3].str()) + 153;
+		}
+		else {
+			responseStringFound = true;
+			std::cout << s;
+		}
+	}
 
-	arduino.flushReceiver();
-
-	return false;
+	return isWaiting ? !responseStringFound : false;
 }
 
 void MotorController::send_move(Move move) {
@@ -146,14 +150,14 @@ void MotorController::capture_piece(chess::Square from, chess::PieceType piece) 
 }
 
 void MotorController::move_to_square(Square square) {
-	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH);
-	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH);
+	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH) * BOARD_GRADIENT_X;
+	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH) * BOARD_GRADIENT_Y;
 	move_to(x, y);
 }
 
 void MotorController::move_to_square(chess::Square square, chess::PieceType piece) {
-	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH);
-	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH);
+	float x = BOARD_OFFSET_X + (square.file() * SQUARE_WIDTH) * BOARD_GRADIENT_X;
+	float y = BOARD_OFFSET_Y + ((7 - square.rank()) * SQUARE_WIDTH) * BOARD_GRADIENT_Y;
 
 	float z = get_z_height(piece) - Z_PICKUP_OFFSET;
 	move_to(x, y, z);
@@ -194,26 +198,13 @@ void MotorController::delay(int milliseconds) {
 }
 
 void MotorController::poll_machine_state() {
-	if (delayTimer <= 0){
-		arduino.writeString("?");
-		
-		char buffer[1000];
-		arduino.readString(buffer, '>', 1000, 100); 
-		
-		std::string response(buffer);
-		std::regex rgx("<.*MPos:([0-9.-]+),([0-9.-]+),([0-9.-]+).*>");
-		std::smatch match;
-
-		if (std::regex_search(response, match, rgx)) {
-			currentX = std::stod(match[1].str());
-			currentY = std::stod(match[2].str());
-			currentZ = std::stod(match[3].str());
-		}
-		delayTimer = DELAY_THRESHOLD;
-	}
-	else {
+	if (delayTimer > 0){
 		delayTimer -= 1;
+		return;
 	}
+
+	arduino.writeString("?");
+	delayTimer = DELAY_THRESHOLD;
 }
 
 void MotorController::go_home() {

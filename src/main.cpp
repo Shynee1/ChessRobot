@@ -16,7 +16,7 @@ int main (int argc, char* args[]){
 	srand(time(0));
 
 	auto window = Window::Instance();
-	window->create_window("Chess");
+	window->create_window("Chess", 1280, 720);
 
 	auto assetPool = AssetPool::Instance();
 	assetPool->load_all_textures("assets/textures"); 
@@ -74,6 +74,10 @@ void register_button_callbacks() {
 	auto gui = GUI::Instance();
 	gui->assign_button_callback("machine", [](){
 		GameManager::Instance()->get_component<MotorController>()->connect();
+	});
+
+	gui->assign_button_callback("board", []() {
+		GameManager::Instance()->get_component<BoardInput>()->connect();
 	});
 
 	gui->assign_button_callback("home", [](){

@@ -132,6 +132,22 @@ int signum(int x) {
 		return 0;
 }
 
+std::vector<std::string> read_all_serial_data(serialib &arduino) {
+	if (!arduino.isDeviceOpen())
+		return {};
+
+	char buffer[1000];
+	std::vector<std::string> data;
+	while (arduino.available() > 0) {
+		arduino.readString(buffer, '\n', 1000);
+		std::string line(buffer);
+		data.push_back(line);
+	}
+
+	arduino.flushReceiver();
+	return data;
+}
+
 void fatal_log(std::string log) {
 	std::cerr << log << std::endl;
 	exit(EXIT_FAILURE);

@@ -4,32 +4,35 @@
 #include "component.hpp"
 #include <regex>
 
-constexpr char ARDUINO_PORT[] = "/dev/ttyACM0";
+constexpr char ARDUINO_PORT[] = "COM4";
 constexpr int BAUD_RATE = 115200;
 
-constexpr float BOARD_OFFSET_X = 68;
-constexpr float BOARD_OFFSET_Y = 11; 
+constexpr float BOARD_OFFSET_X = 52;
+constexpr float BOARD_OFFSET_Y = 18; 
+constexpr float BOARD_GRADIENT_X = 1;
+constexpr float BOARD_GRADIENT_Y = 1;
 constexpr float TAKEN_PIECES_X = 0;
-constexpr float TAKEN_PIECES_Y = 170;
-constexpr float SQUARE_WIDTH = 45;
+constexpr float TAKEN_PIECES_Y = 0;
+constexpr float SQUARE_WIDTH = 45.5;
 constexpr float PIECE_HEIGHT[7] = { 39.8, 49.8, 61.7, 42.7, 76.1, 83.5, 0 };
-constexpr float Z_MAX = 146;
-constexpr float Z_MIN = 10;
+constexpr float Z_MAX = 145;
+constexpr float Z_MIN = 15;
 constexpr float Z_PICKUP_OFFSET = 50;
 constexpr int 	DELAY_THRESHOLD = 10;
-constexpr int 	PICKUP_DELAY_AMOUNT = 100;
+constexpr int 	PICKUP_DELAY_AMOUNT = 0;
 
 class MotorController : public Component {
 private:
 	std::shared_ptr<chess::Board> board;
 	std::shared_ptr<GUI> gui;  
-	
+		
 	serialib arduino;
+	
 	std::queue<std::string> gcodeBuffer;
 	bool electroMagnetOn = false;
 	bool isWaiting = false;
 	bool hasBeenHomed = false;
-	int delayTimer = 100;
+	int delayTimer = DELAY_THRESHOLD;
 	double currentX = 0;
 	double currentY = 0;
 	double currentZ = 0;
@@ -39,7 +42,7 @@ public:
 	void update();
 	void graphics();
 	void connect();
-	bool should_wait();
+	bool parse_serial_data(std::vector<std::string> serialData);
 	void send_move(chess::Move move);
 	void reset();
 	void set_electromagnet(bool on);

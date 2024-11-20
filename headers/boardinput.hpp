@@ -4,8 +4,8 @@
 #include "boardui.hpp"
 #include <queue>
 
-constexpr int SERIAL_BAUD_RATE = 9600;
-constexpr char SERIAL_PORT[] = "COM3";
+constexpr int BOARD_BAUD_RATE = 9600;
+constexpr char BOARD_ARDUINO_PORT[] = "COM3";
 
 class BoardInput : public Component {
 private:
@@ -25,6 +25,7 @@ public:
 	void start();
 	void update();
 	void graphics();
+	void connect();
 	void handle_piece_putdown(int squarePos);
 	void handle_piece_pickup(int squarePos);
 	chess::Move handle_move(int squarePos);

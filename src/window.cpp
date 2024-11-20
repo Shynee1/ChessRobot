@@ -19,13 +19,8 @@ Window::Window(){
 void Window::create_window(std::string title, int screenWidth, int screenHeight) {
 	this->title = title;
 	this->screenDimensions = {screenWidth, screenHeight};
-<<<<<<< HEAD
-	this->screenRatios.x = (double) screenWidth / WORLD_WIDTH;
-	this->screenRatios.y = (double) screenHeight / WORLD_HEIGHT;
-=======
 	this->screenRatios.x = (double) screenDimensions.x / WORLD_WIDTH;
 	this->screenRatios.y = (double) screenDimensions.y / WORLD_HEIGHT;
->>>>>>> 57543030250f2d10ab368575df38c6482c76aab7
 	Label::set_screen_ratios(screenRatios);
 	this->isRunning = true;
 
