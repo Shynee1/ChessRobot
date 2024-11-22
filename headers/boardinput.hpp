@@ -35,4 +35,5 @@ public:
 	chess::Move get_legal_move(int from, int to);
 	bool is_castle(int squarePos);
 	bool read_latest_bitboard();
+	void reset();
 };

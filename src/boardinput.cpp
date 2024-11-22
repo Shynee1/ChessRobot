@@ -25,8 +25,7 @@ void BoardInput::update() {
 	
 	if (!newData) return;
 
-	std::cout << "Previous: " << std::bitset<64>(previousBoard) << std::endl;
-	std::cout << "Current:  " << std::bitset<64>(currentBoard)  << std::endl;
+	this->ui->update_bitboard(currentBoard);
 	
 	movegen::legalmoves(legalMoves, *board);
 
@@ -43,6 +42,7 @@ void BoardInput::update() {
 	}
 
 	previousBoard = currentBoard;
+	
 	std::cout << std::endl;
 }
 
@@ -137,6 +137,10 @@ Move BoardInput::get_legal_move(int from, int to) {
 			return move;
 	}
 	return NULL;
+}
+
+void BoardInput::reset() {
+	this->previousBoard = currentBoard;
 }
 
 bool BoardInput::read_latest_bitboard() {

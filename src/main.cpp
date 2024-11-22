@@ -89,7 +89,7 @@ void register_button_callbacks() {
 	});
 
 	gui->assign_button_callback("softReset", [](){
-		GameManager::Instance()->get_component<MotorController>()->soft_reset();
+		GameManager::Instance()->get_component<BoardInput>()->reset();
 	});
 
 	gui->assign_button_callback("easy", [](){

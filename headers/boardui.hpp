@@ -18,6 +18,8 @@ private:
 	std::shared_ptr<chess::Board> board;
 	std::shared_ptr<GUI> gui;
 
+	U64 currentBoardState;
+
 	chess::Movelist moves;
 
 	std::array<SDL_Color, 64> coloredSquares = {};
@@ -29,6 +31,7 @@ public:
 	void clear_ui();
 	const SDL_Color& move_color();
 	const SDL_Color& clicked_color();
+	void update_bitboard(U64 bitboard);
 private:
 	bool is_visible(SDL_Color& color);
 };

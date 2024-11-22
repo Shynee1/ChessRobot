@@ -9,6 +9,7 @@ void BoardUI::start(){
 	this->board = GameManager::Instance()->get_board();
 
 	this->spritesheet = std::make_unique<Spritesheet>("chess_pieces.png", 2, 6);
+	this->currentBoardState = ~uint64_t(0);
 
 	movegen::legalmoves(moves, *board);
 }
@@ -32,7 +33,7 @@ void BoardUI::graphics() {
 		if (is_visible(squareColor))
 			window->render_color(currentSquare, squareColor);
 		
-		if (piece == Piece::NONE) continue;
+		if (piece == Piece::NONE || !contains_bit(currentBoardState, i)) continue;
 		
 		int textureIndex = get_texture_index(piece);
 		auto p_pieceObject = spritesheet->get_sprite(textureIndex);
@@ -44,6 +45,10 @@ void BoardUI::graphics() {
 
 void BoardUI::color_square(int squarePos, const SDL_Color& color) {
 	coloredSquares[squarePos] = color;
+}
+
+void BoardUI::update_bitboard(U64 bitboard) {
+	this->currentBoardState = bitboard;
 }
 
 void BoardUI::clear_ui() {
