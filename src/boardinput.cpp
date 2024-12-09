@@ -17,9 +17,7 @@ BoardInput::~BoardInput() {
 }
 
 void BoardInput::update() {
-	if (board->sideToMove() != Color::WHITE) return;
-
-	if (!serial.isDeviceOpen()) return;
+	if (board->sideToMove() != Color::WHITE || !serial.isDeviceOpen()) return;
 
 	bool newData = read_latest_bitboard();
 	
