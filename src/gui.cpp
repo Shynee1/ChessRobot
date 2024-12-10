@@ -12,7 +12,7 @@ std::shared_ptr<GUI> GUI::Instance(){
 void GUI::create_ui() {
     auto assetPool = AssetPool::Instance();
 
-	SDL_Texture* boardTex = assetPool->get_texture("Board.png");
+	SDL_Texture* boardTex = assetPool->get_texture("board.png");
 	this->boardTexture = std::make_unique<RenderObject>(boardTex);
 	this->boardTexture->set_dimensions(WORLD_HEIGHT, WORLD_HEIGHT);
 	this->boardTexture->align_center();
