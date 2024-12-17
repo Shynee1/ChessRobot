@@ -1,6 +1,6 @@
 # Chess Robot
 
-The Chess Robot is a fully functional robotic system capable of physically playing chess on a real-world chessboard. It autonomously detects player moves and responds with its own moves using robotics, chess engine logic, and a custom-designed graphical user interface (GUI). The system operates through a 2-axis gantry for X and Y movement, a linear actuator with an **electromagnet** for Z-axis control, and magnetic piece detection using reed sensors under the chessboard.
+The Chess Robot is a fully functional robotic system capable of physically playing chess on a real-world chessboard. It autonomously detects player moves and responds with its own moves using robotics, chess engine logic, and a custom-designed printable circuit board (PCB). The system operates through a 2-axis gantry for X and Y movement, a linear actuator with an electromagnet for Z-axis control, and magnetic piece detection using reed sensors under the chessboard.
 
 This project was created by the **Haverford Electronics Group** with support from **The Haverford School**.
 
@@ -15,8 +15,7 @@ This project was created by the **Haverford Electronics Group** with support fro
 - **Custom GUI**: Provides real-time status, game settings, and control over the robot.
 
 ## Demonstration
-To see the Chess Robot in action, check out this video:
-[https://drive.google.com/file/d/1hXQ2FK0-B0WJ1CRfMA2Q9d0eLAbO2lZv/view?usp=sharing]
+![](https://youtu.be/mtAjI7r33y4)
 
 ## Project Structure
 ```
