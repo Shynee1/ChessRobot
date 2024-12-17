@@ -5,7 +5,7 @@ The Chess Robot is a fully functional robotic system capable of physically playi
 
 This project was created by the **Haverford Electronics Group** with support from **The Haverford School**.
 
-[ChessRobot_GUI](https://github.com/user-attachments/assets/98f5556a-331b-49cb-8486-76731d9ac243)
+![ChessRobot_GUI](https://github.com/user-attachments/assets/98f5556a-331b-49cb-8486-76731d9ac243)
 
 ## How It Works
 
