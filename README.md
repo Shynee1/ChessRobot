@@ -15,7 +15,7 @@ This project was created by the **Haverford Electronics Group** with support fro
 - **Custom GUI**: Provides real-time status, game settings, and control over the robot.
 
 ## Demonstration
-![](https://youtu.be/mtAjI7r33y4)
+![Demonstration](https://youtu.be/mtAjI7r33y4)
 
 ## Project Structure
 ```
