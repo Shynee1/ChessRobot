@@ -79,7 +79,7 @@ ChessRobot/
 
 ## Usage
 1. Turn on the Chess Robot.
-2. Launch the ChessRobot executable from home/programming/ChessRobot/build/build/Release.
+2. Launch the ChessRobot executable from `home/programming/ChessRobot/build/build/Release`.
 3. Connect the machine and board via the GUI.
 4. Use the GUI to:
    - Start a new game.
