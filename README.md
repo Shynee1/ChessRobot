@@ -6,13 +6,6 @@ This project was created by the **Haverford Electronics Group** with support fro
 
 ![ChessRobot_GUI](https://github.com/user-attachments/assets/98f5556a-331b-49cb-8486-76731d9ac243)
 
-## How It Works
-
-1. **Move Detection**: The player moves chess pieces on the board, which activates magnetic reed sensors beneath each square.
-2. **Move Processing**: The robot's software determines the player's move by comparing the new board state with the previous state.
-3. **Move Calculation**: The chess engine calculates the robot's best possible response move.
-4. **Piece Movement**: The robot's gantry system moves along the X, Y, and Z axes to pick up and place pieces using an electromagnet.
-
 ## Key Features
 
 - **Autonomous Chess Play**: Plays chess autonomously against a human player.
@@ -38,23 +31,25 @@ ChessRobot/
 └── .gitignore       # Git ignore file
 ```
 
-## In-depth Explanation
+## How it Works
 
 ### 1. **Move Detection**
-- An Arduino MEGA connected to the custom PCB recieves signals from magnetic reed sensors beneath the chessboard.
-- The `BoardInput` class communicates with the Arduino MEGA to recieve the updated board state.
+- The player moves chess pieces on the board, which activates magnetic reed sensors beneath each square.
+- An Arduino MEGA connected to a custom PCB receives signals from the reed sensors and sends them via serial.
+- The `BoardInput` class communicates with the Arduino MEGA to receive the updated board state.
 - The system tracks changes in the board state to identify the origin and destination squares of the player's move.
+- Error correction is added to improve the robot's reliability even if the sensors malfunction.
 
 ### 2. **Move Calculation**
 - The new board state is processed by a chess engine to calculate the best response.
 - This engine can be set to easy, medium, or hard.
-- By default the robot runs Stockfish 17 but a ![custom chess engine](https://github.com/Shynee1/ChessEngine) can be used instead.
+- By default the robot runs Stockfish 17 but a [custom chess engine](https://github.com/Shynee1/ChessEngine) can be used instead.
 
 ### 3. **Piece Movement**
 - The robot's gantry system uses GRBL commands to move to the starting position of the piece.
-- The Z-axis actuator lowers the electromagnet to magnetically pick-up the piece.
+- The Z-axis actuator lowers the electromagnet to pick up the piece magnetically.
 - The robot moves it to the target square and turns off the electromagnet to release the piece.
-- The robot is always sent to home after every move to ensure saftey.
+- The robot is always sent home after every move to ensure safety.
 
 ## Getting Started
 
