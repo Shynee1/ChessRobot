@@ -4,7 +4,7 @@
 #include "component.hpp"
 #include <regex>
 
-constexpr char ARDUINO_PORT[] = "COM4";
+constexpr char ARDUINO_PORT[] = "/dev/ttyACM1";
 constexpr int BAUD_RATE = 115200;
 
 constexpr float BOARD_OFFSET_X = 61;
