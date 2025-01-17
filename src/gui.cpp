@@ -61,7 +61,7 @@ void GUI::create_ui() {
 	add_label("boardConnectedText", {{TEXT_PADDING_X, 61}, "Board:", arial, LIGHT_GREY});
 	add_label("boardConnected", {{119, 61}, "Disconnected", arial, LIGHT_GREY});
 	add_label("line3", {{0, 94}, "________________________________________________________", panton9, LIGHT_GREY});
-	add_label("skillLevel", {{TEXT_PADDING_X, 123}, "Skill Level: 0", arial, LIGHT_GREY});
+	add_label("skillLevel", {{TEXT_PADDING_X, 123}, "Target ELO: 0", arial, LIGHT_GREY});
 	add_label("targetDepth", {{TEXT_PADDING_X, 162}, "Target Depth: 0", arial, LIGHT_GREY});
 	add_label("thinkTime", {{TEXT_PADDING_X, 206}, "Think Time: 0", arial, LIGHT_GREY});
 	add_label("line4", {{0, 239}, "________________________________________________________", panton9, LIGHT_GREY});

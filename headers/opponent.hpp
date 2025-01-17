@@ -10,9 +10,9 @@ class Opponent : public Component {
 private:
 	const chess::Color color = chess::Color::BLACK;
 	const std::array<StockfishSettings, 9> levelMap = { 
-		StockfishSettings(-20, 1, 10, 2),
-		StockfishSettings(3, 5, 200, 2),
-		StockfishSettings(20, 22, 1500, 2)
+		StockfishSettings(1320, 1, 10, 1),
+		StockfishSettings(2000, 5, 200, 2),
+		StockfishSettings(3190, 22, 1500, 4)
 	};
 	std::unique_ptr<Stockfish> stockfish;
 	std::shared_ptr<GUI> gui;
