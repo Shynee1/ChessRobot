@@ -7,12 +7,6 @@ This project was created by the **Haverford Electronics Group** with support fro
 ![Soft Robotics Team Photo](https://github.com/Shynee1/ChessRobot/blob/main/assets/media/IMG_4239.jpg)
 Haverford Electronics Group members Finn Kelly (left) and Jack Ford (right) posing with the robot
 
-![Jack Ford Playing Chess](https://github.com/Shynee1/ChessRobot/blob/main/assets/media/IMG_4226.jpg)
-Jack Ford playing against the Chess Robot
-
-![ChessRobot_GUI](https://github.com/user-attachments/assets/98f5556a-331b-49cb-8486-76731d9ac243)
-Graphical interface displayed on the Chess Robot
-
 News Article: [https://thsindex.org/2024/10/15/soft-robotics-designschess-playing-robot/](https://thsindex.org/2024/10/15/soft-robotics-designschess-playing-robot/)
 
 ## Key Features
