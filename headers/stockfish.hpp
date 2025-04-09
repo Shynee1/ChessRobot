@@ -2,7 +2,7 @@
 #include "utility.hpp"
 #include <boost/process.hpp>
 
-constexpr char EXEC_PATH[] = "C:\\vclib\\stockfish\\stockfish-windows-x86-64.exe";
+constexpr char EXEC_PATH[] = "/usr/games/stockfish";
 
 struct StockfishSettings {
 	int elo;
