@@ -4,7 +4,7 @@
 #include "component.hpp"
 #include <regex>
 
-constexpr char ARDUINO_PORT[] = "COM4";
+constexpr char ARDUINO_PORT[] = "/dev/ttyACM1";
 constexpr int BAUD_RATE = 115200;
 
 constexpr float BOARD_OFFSET_X = 61;
@@ -15,7 +15,7 @@ constexpr float TAKEN_PIECES_X = 0;
 constexpr float TAKEN_PIECES_Y = 0;
 constexpr float SQUARE_WIDTH = 45.5;
 constexpr float PIECE_HEIGHT[7] = { 39.8, 49.8, 61.7, 42.7, 75.1, 82.5, 0 };
-constexpr float Z_MAX = 142;
+constexpr float Z_MAX = 145;
 constexpr float Z_MIN = 15;
 constexpr float Z_PICKUP_OFFSET = 50;
 constexpr int 	DELAY_THRESHOLD = 10;

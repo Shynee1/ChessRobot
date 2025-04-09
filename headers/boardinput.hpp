@@ -5,7 +5,7 @@
 #include <queue>
 
 constexpr int BOARD_BAUD_RATE = 9600;
-constexpr char BOARD_ARDUINO_PORT[] = "COM3";
+constexpr char BOARD_ARDUINO_PORT[] = "/dev/ttyACM0";
 
 class BoardInput : public Component {
 private:
