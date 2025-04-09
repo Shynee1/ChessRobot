@@ -8,7 +8,7 @@ Stockfish::Stockfish(std::shared_ptr<chess::Board> board) {
 	
 	this->board = board;
 
-	set_settings({-20, 1, 10, 2});
+	set_settings({1320, 1, 10, 2});
 
 	this->currentSearchDepth = "Book";
 	this->currentScore = "Book";
@@ -68,8 +68,11 @@ void Stockfish::generate_best_move() {
 
 void Stockfish::set_settings(StockfishSettings settings) {
 	this->settings = settings;
-	writeStream << "setoption name Skill Level value " << settings.skillLevel << std::endl;
 	writeStream << "setoption name Threads value " << settings.threads << std::endl;
+	if (settings.elo != 3190) {
+		writeStream << "setoption name UCI_LimitStrength value True" << std::endl;
+		writeStream << "setoption name UCI_Elo value " << settings.elo << std::endl;
+	}
 }
 
 std::string Stockfish::generate_score_string(std::string scoreType, std::string scoreValue) {

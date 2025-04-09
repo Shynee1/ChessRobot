@@ -5,13 +5,13 @@
 constexpr char EXEC_PATH[] = "/usr/games/stockfish";
 
 struct StockfishSettings {
-	int skillLevel;
+	int elo;
 	int depth;
 	int movetime;
 	int threads;
 
-	StockfishSettings(int skillLevel, int depth, int movetime, int threads)
-		: skillLevel(skillLevel), depth(depth), movetime(movetime), threads(threads){}
+	StockfishSettings(int elo, int depth, int movetime, int threads)
+		: elo(elo), depth(depth), movetime(movetime), threads(threads){}
 
 	StockfishSettings() = default;
 };

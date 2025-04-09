@@ -72,7 +72,7 @@ void Opponent::set_stockfish_level(int level) {
 		stockfish->set_settings(setting);
 
 	auto gui = GUI::Instance();
-	gui->get_label("skillLevel").set_text("Skill Level: " + std::to_string(setting.skillLevel));
+	gui->get_label("skillLevel").set_text("Target ELO: " + std::to_string(setting.elo));
 	gui->get_label("targetDepth").set_text("Target Depth: " + std::to_string(setting.depth));
 	gui->get_label("thinkTime").set_text("Think Time: " + std::to_string(setting.movetime));
 }
