@@ -5,8 +5,19 @@ using namespace chess;
 void BoardUI::start(){
 	this->window = Window::Instance();
 	this->assetPool = AssetPool::Instance();
-	this->gui = GUI::Instance();
 	this->board = GameManager::Instance()->get_board();
+
+	TTF_Font* arialLarge = assetPool->get_font("arial80");
+	TTF_Font* arialSmall = assetPool->get_font("arial38");
+	SDL_Point topPoint = {0, 260};
+	SDL_Point bottomPoint = {0, 375};
+
+	this->gameOverText = std::make_unique<Label>(topPoint, "GAME OVER", arialLarge, WHITE);
+	this->gameOverText->center_horizontally();
+
+	std::string placeholder = "Placeholder";
+	this->championText = std::make_unique<Label>(bottomPoint, placeholder.c_str(), arialSmall, WHITE);
+	this->championText->center_horizontally();
 
 	this->spritesheet = std::make_unique<Spritesheet>("chess_pieces.png", 2, 6);
 	this->currentBoardState = ~uint64_t(0);
@@ -41,6 +52,52 @@ void BoardUI::graphics() {
 		p_pieceObject->set_dimensions(SQUARE_SIZE, SQUARE_SIZE);
 		window->render_object(p_pieceObject.get());
 	}
+
+	auto gameState = board->isGameOver();
+    if (gameState.first != chess::GameResultReason::NONE){
+		window->render_color(GAME_OVER_RECT, GAME_OVER_COLOR);
+		window->render_label(*gameOverText);
+
+		std::string reason = create_text(gameState);
+		championText->set_text(reason);
+		championText->center_horizontally();
+		window->render_label(*championText);
+	}
+}
+
+std::string BoardUI::create_text(std::pair<chess::GameResultReason, chess::GameResult> gameResult) {
+	std::string color = "";
+	switch(gameResult.second){
+		case chess::GameResult::WIN:
+			color = "White won";
+			break;
+		case chess::GameResult::LOSE:
+			color = "Black won";
+			break;
+		case chess::GameResult::DRAW:
+			color = "Game drawn";
+			break;
+	}
+
+	std::string reason = "";
+	switch (gameResult.first){
+		case chess::GameResultReason::CHECKMATE:
+			reason = "Checkmate";
+			break;
+		case chess::GameResultReason::FIFTY_MOVE_RULE:
+			reason = "50 Move Rule";
+			break;
+		case chess::GameResultReason::INSUFFICIENT_MATERIAL:
+			reason = "Insufficient Material";
+			break;
+		case chess::GameResultReason::STALEMATE:
+			reason = "Stalemate";
+			break;
+		case chess::GameResultReason::THREEFOLD_REPETITION:
+			reason = "Repition";
+	}
+
+	return color + " by " + reason;
 }
 
 void BoardUI::color_square(int squarePos, const SDL_Color& color) {

@@ -31,6 +31,9 @@ Label::Label(SDL_Point pos, std::string text, TTF_Font* font, SDL_Color color) {
 
 void Label::set_text(std::string newText) {
     this->text = newText;
+    TTF_SizeText(font, text.c_str(), &this->dimensions.w, &this->dimensions.h);
+    this->dimensions.w *= (1 / Label::screenRatios.x);
+    this->dimensions.h *= (1 / Label::screenRatios.y);
 }
 
 void Label::set_position(SDL_Point newPos) {
@@ -44,6 +47,10 @@ void Label::set_font(TTF_Font* newFont) {
 
 void Label::set_color(SDL_Color newColor) {
     this->color = newColor;
+}
+
+void Label::center_horizontally() {
+    this->dimensions.x = (int) ((WORLD_WIDTH / 2.0) - (dimensions.w / 2.0));
 }
 
 std::string Label::get_text() {

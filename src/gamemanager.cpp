@@ -15,21 +15,24 @@ void GameManager::start_game(std::string fen){
 
     for (const auto& component : components)
         component->start();
+
+    this->componentsInitialzed = true;
 }
 
 void GameManager::end_game(){
     this->isGameRunning = false;
+    this->componentsInitialzed = false;
 }
 
 void GameManager::update_components() {
     if (!isGameRunning) return;
-
+    
     for (const auto& component : components)
         component->update();
 }
 
 void GameManager::draw_components() {
-    if (!isGameRunning) return;
+    if (!componentsInitialzed) return;
     
     for (const auto& component : components)
         component->graphics();

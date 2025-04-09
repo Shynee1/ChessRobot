@@ -6,20 +6,22 @@
 #include "spritesheet.hpp"
 #include "gamemanager.hpp"
 
-constexpr SDL_Color CLICKED_COLOR = { 255, 217, 0, 60 };
-constexpr SDL_Color MOVE_COLOR = { 66, 135, 245, 125 };
+constexpr SDL_Rect GAME_OVER_RECT = {325, 135, 630, 450};
+constexpr SDL_Color CLICKED_COLOR = {255, 217, 0, 60};
+constexpr SDL_Color MOVE_COLOR = {66, 135, 245, 125};
+constexpr SDL_Color GAME_OVER_COLOR = {0, 0, 0, 220};
 
 class BoardUI : public Component {
 private:
 	std::unique_ptr<Spritesheet> spritesheet;
+	std::unique_ptr<Label> gameOverText;
+	std::unique_ptr<Label> championText;
 	
 	std::shared_ptr<AssetPool> assetPool;
 	std::shared_ptr<Window> window;
 	std::shared_ptr<chess::Board> board;
-	std::shared_ptr<GUI> gui;
 
 	U64 currentBoardState;
-
 	chess::Movelist moves;
 
 	std::array<SDL_Color, 64> coloredSquares = {};
@@ -34,4 +36,5 @@ public:
 	void update_bitboard(U64 bitboard);
 private:
 	bool is_visible(SDL_Color& color);
+	std::string create_text(std::pair<chess::GameResultReason, chess::GameResult> gameResult);
 };

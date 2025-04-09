@@ -2,6 +2,7 @@
 #include "utility.hpp"
 #include "component.hpp"
 #include "openingbook.hpp"
+#include "gui.hpp"
 
 class GameManager {
 private:
@@ -9,7 +10,10 @@ private:
     std::shared_ptr<chess::Board> board;
     std::shared_ptr<OpeningBook> openingBook;
     std::vector<std::shared_ptr<Component>> components = {};
+    std::pair<chess::GameResultReason, chess::GameResult> gameState;
     bool isGameRunning = false;
+    bool componentsInitialzed = false;
+
 public:
     static std::shared_ptr<GameManager> Instance();
     GameManager() = default;
@@ -39,4 +43,5 @@ public:
     std::shared_ptr<chess::Board> get_board();
     std::shared_ptr<OpeningBook> get_opening_book();
     bool is_game_running();
+
 };

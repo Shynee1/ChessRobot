@@ -189,12 +189,15 @@ void Window::update() {
 void Window::mouse_press_callback(SDL_MouseButtonEvent &e) {
 	if (e.button != SDL_BUTTON_LEFT) return;
 	isMousePressed = true;
-
 }
 
 
 void Window::mouse_unpress_callback(SDL_MouseButtonEvent &e) {
-	if (e.button != SDL_BUTTON_LEFT) return;
+	if (e.button != SDL_BUTTON_LEFT) {
+		close();
+		return;
+	}
+	
 	isMousePressed = false;
 }
 

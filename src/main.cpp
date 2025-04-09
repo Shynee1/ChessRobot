@@ -23,6 +23,8 @@ int main (int argc, char* args[]){
 
 	std::vector<int> fontSizes = {38, 21, 24, 15, 31, 9};
 	assetPool->add_font("assets/fonts/arial.ttf", 22);
+	assetPool->add_font("assets/fonts/arial.ttf", 38);
+	assetPool->add_font("assets/fonts/arial.ttf", 80);
 	assetPool->load_font_sizes("assets/fonts/panton.ttf", fontSizes);
 
 	auto gui = GUI::Instance();
@@ -53,7 +55,7 @@ int main (int argc, char* args[]){
 				window->mouse_unpress_callback(event.button);
 				break;
 			case SDL_KEYUP:
-				exit(EXIT_SUCCESS);
+				window->close();
 				break;
 			}
 		}
