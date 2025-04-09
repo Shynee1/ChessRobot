@@ -124,8 +124,12 @@ void MotorController::pickup_piece(PieceType piece, bool fullyLiftPiece) {
 	}
 }
 
-void MotorController::putdown_piece(PieceType piece) {
+void MotorController::putdown_piece(PieceType piece, bool isCapturedPiece) {
 	float z = get_z_height(piece);
+	if (isCapturedPiece) {
+		z -= Z_CAPTURED_OFFSET;
+	}
+
 	move_to(z);
 	set_electromagnet(false);
 	move_to(Z_MIN);
@@ -139,14 +143,16 @@ void MotorController::move_piece(Square from, Square to, PieceType piece, bool c
 		move_to_square(to);
 	else
 		move_to_square(to, piece);
-	putdown_piece(piece);
+	putdown_piece(piece, false);
 }
 
 void MotorController::capture_piece(chess::Square from, chess::PieceType piece) {
 	move_to_square(from);
 	pickup_piece(piece, true);
-	move_to(TAKEN_PIECES_X, TAKEN_PIECES_Y);
-	putdown_piece(piece);
+	move_to(takenPiecesX, takenPiecesY);
+	putdown_piece(piece, true);
+
+	takenPiecesY += SQUARE_WIDTH;
 }
 
 void MotorController::move_to_square(Square square) {

@@ -7,17 +7,16 @@
 constexpr char ARDUINO_PORT[] = "/dev/ttyACM1";
 constexpr int BAUD_RATE = 115200;
 
-constexpr float BOARD_OFFSET_X = 61;
+constexpr float BOARD_OFFSET_X = 63;
 constexpr float BOARD_OFFSET_Y = 9; 
 constexpr float BOARD_GRADIENT_X = 1;
 constexpr float BOARD_GRADIENT_Y = 1;
-constexpr float TAKEN_PIECES_X = 0;
-constexpr float TAKEN_PIECES_Y = 0;
 constexpr float SQUARE_WIDTH = 45.5;
 constexpr float PIECE_HEIGHT[7] = { 39.8, 49.8, 61.7, 42.7, 75.1, 82.5, 0 };
 constexpr float Z_MAX = 145;
 constexpr float Z_MIN = 15;
 constexpr float Z_PICKUP_OFFSET = 50;
+constexpr float Z_CAPTURED_OFFSET = 72;
 constexpr int 	DELAY_THRESHOLD = 10;
 constexpr int 	PICKUP_DELAY_AMOUNT = 0;
 
@@ -33,9 +32,14 @@ private:
 	bool isWaiting = false;
 	bool hasBeenHomed = false;
 	int delayTimer = DELAY_THRESHOLD;
+
 	double currentX = 0;
 	double currentY = 0;
 	double currentZ = 0;
+
+	double takenPiecesX = 0;
+	double takenPiecesY = 0;
+	double takenPiecesZ = 0;
 public:
 	~MotorController();
 	void start();
@@ -47,7 +51,7 @@ public:
 	void reset();
 	void set_electromagnet(bool on);
 	void pickup_piece(chess::PieceType piece, bool fullyLiftPiece);
-	void putdown_piece(chess::PieceType piece);
+	void putdown_piece(chess::PieceType piece, bool isTakenPiece);
 	void move_piece(chess::Square from, chess::Square to, chess::PieceType piece, bool castlingOverride = false);
 	void capture_piece(chess::Square from, chess::PieceType piece);
 	void move_to_square(chess::Square square);
