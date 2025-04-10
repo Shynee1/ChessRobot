@@ -152,7 +152,11 @@ void MotorController::capture_piece(chess::Square from, chess::PieceType piece) 
 	move_to(takenPiecesX, takenPiecesY);
 	putdown_piece(piece, true);
 
-	takenPiecesY += SQUARE_WIDTH;
+	takenPiecesY -= SQUARE_WIDTH;
+	
+	if (takenPiecesY < 0) {
+		takenPiecesY = TAKEN_PIECES_Y_MAX;
+	}
 }
 
 void MotorController::move_to_square(Square square) {
@@ -184,6 +188,7 @@ void MotorController::move_to(float z) {
 void MotorController::home_machine() {
 	gcodeBuffer.push("$H");
 	gcodeBuffer.push("G10 P0 L20 X0 Y0 Z0");
+	move_to(BOARD_OFFSET_X, BOARD_OFFSET_Y);
 	gcodeBuffer.push("G28.1");
 	hasBeenHomed = true;
 }
