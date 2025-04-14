@@ -142,20 +142,79 @@ void BoardInput::reset() {
 }
 
 bool BoardInput::read_latest_bitboard() {
-	const int numBytes = 8;
+    auto currentTime = std::chrono::steady_clock::now();
+    
+    // Check for timeout on partial frames
+    if (serialReadState != ReadState::WAITING_FOR_START) {
+        auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+            currentTime - lastFrameTime).count();
+            
+        if (elapsedMs > FRAME_TIMEOUT_MS) {
+            std::cerr << "Frame timeout - resetting state machine" << std::endl;
+            serialReadState = ReadState::WAITING_FOR_START;
+            dataBufferIndex = 0;
+        }
+    }
+    
+    while (serial.available() > 0) {
+        unsigned char inByte;
+		if (serialReadState != ReadState::READING_DATA && !serial.readBytes(&inByte, 1))
+			continue;
+        
+        switch (serialReadState) {
+            case ReadState::WAITING_FOR_START:
+			{
+                if (inByte == START_MARKER) {
+                    serialReadState = ReadState::READING_DATA;
+                    dataBufferIndex = 0;
+                    lastFrameTime = currentTime;
+                }
+			}
+            break;
+                
+            case ReadState::READING_DATA:
+			{
+				int bytesAvailable = serial.available();
+				int maxBytes = BOARD_DATA_SIZE - dataBufferIndex;
 
-	if (serial.available() <= 0 )
-		return false;
+				int bytesToRead = std::min(bytesAvailable, maxBytes);
 
-	unsigned char buffer[numBytes];
-	serial.readBytes(buffer, numBytes);
+				serial.readBytes(&dataBuffer[dataBufferIndex], bytesToRead);
+				dataBufferIndex += bytesToRead;
+				
+				lastFrameTime = currentTime;
+                
+                // Check if we've read all data bytes
+                if (dataBufferIndex == BOARD_DATA_SIZE) {
+                    serialReadState = ReadState::COMPLETE_FRAME;
+                }
+			}
+            break;
 
-	currentBoard = 0ULL;
+            case ReadState::COMPLETE_FRAME:
+			{
+                // We expect this byte to be the end marker
+                if (inByte == END_MARKER) {
+                    currentBoard = 0ULL;
+                    for (int i = 0; i < BOARD_DATA_SIZE; i++) {
+                        currentBoard |= (U64) dataBuffer[i] << (i * 8);
+                    }
+                    
+                    serialReadState = ReadState::WAITING_FOR_START;
+                    dataBufferIndex = 0;
+                    
+                    return true;
+                } else {
+                    std::cerr << "Invalid end marker: 0x" << std::hex 
+                              << static_cast<int>(inByte) << std::dec << std::endl;
+                    
+                    serialReadState = ReadState::WAITING_FOR_START;
+                    dataBufferIndex = 0;
+                }
+			}
+            break;
+        }
+    }
 
-	for (int i = 0; i < numBytes; i++) {
-		currentBoard |= (U64) buffer[i] << (i * 8);
-	}
-
-	return true;
+    return false;
 }
-
