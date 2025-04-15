@@ -24,6 +24,7 @@ private:
 	std::shared_ptr<BoardUI> ui;
 	serialib serial;
 
+	U64 startBitboard;
 	U64 currentBoard;
 	U64 previousBoard;
 	chess::Movelist legalMoves;
@@ -45,12 +46,9 @@ public:
 	void connect();
 	void handle_piece_putdown(int squarePos);
 	void handle_piece_pickup(int squarePos);
-	chess::Move handle_move(int squarePos);
-	chess::Move handle_capture(int squarePos);
-	chess::Move handle_en_passant(int squarePos);
-	chess::Move handle_castle(int squarePos);
+	chess::Move handle_castle(int fromSquare, int toSquare);
 	chess::Move get_legal_move(int from, int to);
-	bool is_castle(int squarePos);
+	bool is_castle(int fromSquare, int toSquare);
 	bool read_latest_bitboard();
 	void reset();
 };
