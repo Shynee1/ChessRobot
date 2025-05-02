@@ -8,7 +8,7 @@ This project was created by the **Haverford Electronics Group** with support fro
 Haverford Electronics Group members Finn Kelly (left) and Jack Ford (right) posing with the robot
 
 ## Media Coverage
-- [The Index] (https://thsindex.org/2024/10/15/soft-robotics-designschess-playing-robot/)\
+- [The Index](https://thsindex.org/2024/10/15/soft-robotics-designschess-playing-robot/)\
 - [The Haverford School](https://www.haverford.org/about-us/campus-news/campus-news-posts/~board/all-school-news/post/haverford-soft-robotics-club-creates-the-chess-bot)
 
 ## Key Features
